@@ -1,0 +1,9 @@
+# Migration with php
+php artisan migrate:fresh
+php artisan db:seed
+[mariadb/mysql] -u {username} (-p) < ./sql/migration.sql
+
+# Migration with sail
+sail artisan migrate:fresh
+sail artisan db:seed
+sail mariadb -u root < ./sql/migration.sql

@@ -1,0 +1,7 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/Admin/**/*';
+@source '../../../../app/Forms/**/*';
+@source '../../../../resources/views/filament/admin/**/*';
+@source '../../../../vendor/wire-elements/**/*.blade.php';
+@source '../../../../vendor/bezhansalleh/filament-panel-switch/resources/views/**/*.blade.php'
