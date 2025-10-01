@@ -6,6 +6,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use App\Models\MediaItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -37,22 +38,18 @@ class AllMediaTable
                             $mediaFile = $record->mediaFiles->first();
                             if ($mediaFile) {
                                 try {
-                                    // Get the original URL first to check if file exists
-                                    $originalUrl = $mediaFile->getUrl();
-                                    // Try to get thumb conversion URL
-                                    $thumbUrl = $mediaFile->getUrl('thumb');
-                                    \Log::info('Media file URLs', [
-                                        'original' => $originalUrl,
-                                        'thumb' => $thumbUrl,
-                                        'media_id' => $mediaFile->id
-                                    ]);
-                                    return $thumbUrl;
+                                    // Try to get thumb conversion URL first
+                                    return $mediaFile->getUrl('thumb');
                                 } catch (\Exception $e) {
-                                    \Log::error('Error getting media URL: ' . $e->getMessage());
-                                    return '';
+                                    // Fallback to original URL if thumb doesn't exist
+                                    try {
+                                        return $mediaFile->getUrl();
+                                    } catch (\Exception $e) {
+                                        return '/images/placeholder.png';
+                                    }
                                 }
                             }
-                            return '';
+                            return '/images/placeholder.png';
                         })
                         ->defaultImageUrl('/images/placeholder.png')
                         ->extraImgAttributes(['loading' => 'lazy']),

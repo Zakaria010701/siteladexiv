@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+/* Force light mode and prevent automatic dark mode switching */
+html {
+    color-scheme: light !important;
+}
+
+:root {
+    color-scheme: light !important;
+}
+
+/* Override any dark mode classes that might be applied */
+.dark {
+    color-scheme: light !important;
+    background-color: white !important;
+    color: black !important;
+}
+
+.dark body {
+    background-color: #f9fafb !important;
+    color: #111827 !important;
+}
+
+/* Ensure all elements use light theme colors */
+.dark * {
+    color-scheme: light !important;
+}

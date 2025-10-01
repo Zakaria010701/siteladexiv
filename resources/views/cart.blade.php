@@ -25,8 +25,8 @@
                                 @csrf
                                 <input type="hidden" name="item_type" value="{{ $item->cart_type }}">
                                 <input type="hidden" name="item_id" value="{{ $item->id }}">
-                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-                                    Remove
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded" title="Remove">
+                                    @svg('heroicon-o-trash', 'w-4 h-4')
                                 </button>
                             </form>
                         </div>
@@ -41,16 +41,16 @@
             <div class="flex justify-between">
                 <form action="{{ route('cart.clear') }}" method="POST">
                     @csrf
-                    <button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded">
-                        Clear Cart
+                    <button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white p-3 rounded" title="Clear Cart">
+                        @svg('heroicon-o-x-mark', 'w-5 h-5')
                     </button>
                 </form>
-                <a href="{{ route('booking') }}?cart_services={{ implode(',', $cartServices ?? []) }}&cart_packages={{ implode(',', $cartPackages ?? []) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded font-medium">
-                    Proceed to Booking
+                <a href="{{ route('booking') }}?cart_services={{ implode(',', $cartServices ?? []) }}&cart_packages={{ implode(',', $cartPackages ?? []) }}" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded font-medium" title="Proceed to Booking">
+                    @svg('heroicon-o-arrow-right', 'w-5 h-5')
                 </a>
             </div>
         @else
-            <p class="text-center text-gray-500">Your cart is empty. <a href="{{ route('main') }}" class="text-blue-500">Continue shopping</a></p>
+            <p class="text-center text-gray-500">Your cart is empty. <a href="/home" class="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-300">Continue shopping</a></p>
         @endif
     </div>
 </x-layouts.guest>

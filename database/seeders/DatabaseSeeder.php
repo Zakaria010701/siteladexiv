@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AvailabilityTypeSeeder::class);
         $this->call(SystemResourceSeeder::class);
         $this->call(SampleDataSeeder::class);
+        $this->call(MediaSeeder::class);
     }
 }

@@ -17,10 +17,16 @@ class IconTextBlock
             ->icon('heroicon-o-chat-bubble-left-right')
             ->schema([
                 TextInput::make('title')
-                    ->label('Block Title (optional)'),
+                    ->label('Block Title (optional)')
+                    ->placeholder('Enter block title (optional)')
+                    ->helperText('This title will be displayed above the icon items'),
                 \Filament\Forms\Components\Repeater::make('items')
                     ->label('Icon Items')
                     ->schema([
+                        TextInput::make('header')
+                            ->label('Header')
+                            ->placeholder('Enter item header (optional)')
+                            ->helperText('Optional header text for this icon item'),
                         Select::make('icon')
                             ->label('Icon')
                             ->options([
@@ -59,7 +65,7 @@ class IconTextBlock
                             ->required()
                             ->tel(fn ($get) => $get('type') === 'phone'),
                     ])
-                    ->columns(3)
+                    ->columns(4)
                     ->defaultItems(1)
                     ->minItems(1),
             ]);

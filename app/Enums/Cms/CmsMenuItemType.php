@@ -9,4 +9,5 @@ enum CmsMenuItemType: string
     case Page = 'page';
     case Icon = 'icon';
     case Header = 'header';
+    case Button = 'button';
 }

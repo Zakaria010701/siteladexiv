@@ -17,7 +17,7 @@ class HeaderContactSeeder extends Seeder
             'welcome_text' => 'Welcome to our website',
             'phone' => '069 2108 9619',
             'email' => 'Kontakt-Formular',
-            'address' => 'Konrad 15, Frankfurt Friedrichstraße 57, Wiesbaden',
+            'address' => 'Roßmarkt 15, Frankfurt Friedrichstraße 57, Wiesbaden',
             'facebook_url' => null, // Add your Facebook URL here if available
             'instagram_url' => null, // Add your Instagram URL here if available
             'tiktok_url' => null, // Add your TikTok URL here if available

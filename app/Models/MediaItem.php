@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class MediaItem extends Model implements HasMedia
 {
     use InteractsWithMedia;
-
-    protected $table = 'media_items';
 
     protected $fillable = [
         'name',
@@ -36,6 +36,30 @@ class MediaItem extends Model implements HasMedia
     protected static function boot()
     {
         parent::boot();
+
+        static::saved(function ($mediaItem) {
+            // Handle file uploads when the model is saved
+            if ($mediaItem->files && is_array($mediaItem->files)) {
+                foreach ($mediaItem->files as $filePath) {
+                    try {
+                        $fullPath = storage_path('app/public/' . $filePath);
+                        if (file_exists($fullPath)) {
+                            $mediaFile = $mediaItem
+                                ->addMediaFromPath($fullPath)
+                                ->usingName($mediaItem->name)
+                                ->usingFileName(basename($fullPath))
+                                ->toMediaCollection($mediaItem->collection ?: 'default');
+
+                            \Illuminate\Support\Facades\Log::info('Auto-created Spatie Media: ' . $mediaFile->id . ' for file: ' . $filePath);
+                        } else {
+                            \Illuminate\Support\Facades\Log::warning('File does not exist at path: ' . $fullPath);
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Failed to auto-create Spatie Media for file ' . $filePath . ': ' . $e->getMessage());
+                    }
+                }
+            }
+        });
     }
 
     /**

@@ -11,9 +11,10 @@ use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Schemas\Components\Flex;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Flex;
+use Filament\Forms\Components\Hidden;
 use Throwable;
 use App\Actions\Appointments\BookAppointment;
 use App\Actions\Customers\FindOrCreateCustomer;
@@ -89,7 +90,15 @@ class Booking extends Component implements HasForms
         }
 
         if (!empty($serviceIds)) {
-            $this->form->fill(['services' => $serviceIds]);
+            // Convert service IDs to service_selections format
+            $serviceSelections = [];
+            foreach ($serviceIds as $serviceId) {
+                $serviceSelections[] = [
+                    'service_id' => $serviceId,
+                    'quantity' => 1,
+                ];
+            }
+            $this->form->fill(['service_selections' => $serviceSelections]);
         }
 
         if (!empty($allServices)) {
@@ -127,7 +136,7 @@ class Booking extends Component implements HasForms
                         ]),
                     Step::make(__('Services'))
                         ->icon('heroicon-o-shopping-bag')
-                        ->description(fn (Get $get) => Service::whereIn('id', $get('services'))->implode('short_code', ', '))
+                        ->description(fn (Get $get) => $this->getSelectedServicesDescription($get('service_selections')))
                         ->schema([
                             Select::make('service_packages')
                                 ->live(onBlur: true)
@@ -148,11 +157,52 @@ class Booking extends Component implements HasForms
                                     $services = Service::whereHas('servicePackages', fn (Builder $query) => $query->whereIn('service_packages.id', $state))->get();
                                     $set('services', $services->pluck('id')->toArray());
                                 }),
-                            CheckboxList::make('services')
-                                ->live(onBlur: true, debounce: '1s')
-                                ->options(fn (Get $get) => Service::query()->where('category_id', $get('category_id'))->pluck('name', 'id'))
+                            Repeater::make('service_selections')
+                                ->label('Services')
+                                ->schema([
+                                    Select::make('service_id')
+                                        ->label('Service')
+                                        ->options(fn (Get $get) => Service::query()->where('category_id', $get('../../category_id'))->pluck('name', 'id'))
+                                        ->required()
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function (?string $state, Get $get, Set $set) {
+                                            if ($state) {
+                                                $service = Service::find($state);
+                                                if ($service) {
+                                                    $set('../unit_price', $service->price);
+                                                }
+                                            }
+                                        }),
+                                    TextInput::make('quantity')
+                                        ->label('Quantity')
+                                        ->numeric()
+                                        ->default(1)
+                                        ->minValue(1)
+                                        ->required()
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function (?string $state, Get $get, Set $set) {
+                                            $quantity = (int) $state;
+                                            $unitPrice = (float) $get('../unit_price');
+                                            $set('../subtotal', $quantity * $unitPrice);
+                                        }),
+                                    TextInput::make('unit_price')
+                                        ->label('Unit Price')
+                                        ->disabled()
+                                        ->dehydrated(false),
+                                    TextInput::make('subtotal')
+                                        ->label('Subtotal')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->prefix('€'),
+                                ])
                                 ->columns(4)
-                                ->required(),
+                                ->columnSpanFull()
+                                ->default([])
+                                ->live(onBlur: true, debounce: '1s')
+                                ->afterStateUpdated(function (?array $state, Get $get, Set $set) {
+                                    // Update available time slots when services change
+                                    $set('../services', collect($state)->pluck('service_id')->filter()->toArray());
+                                }),
                         ]),
                     Step::make(__('Time'))
                         ->icon('heroicon-o-calendar-days')
@@ -173,7 +223,7 @@ class Booking extends Component implements HasForms
                                         appointmentType: $get('appointment_type'),
                                         branch: $get('branch_id'),
                                         category: $get('category_id'),
-                                        services: $get('services'),
+                                        services: $this->getSelectedServiceIds($get('service_selections')),
                                         providers: null,
                                     )->openOptions())
                                     ->columns([
@@ -185,7 +235,8 @@ class Booking extends Component implements HasForms
                                     ->hidden(fn (Get $get) => empty($get('date')))
                                     ->required(),
                             ])->from('md'),
-
+                            Hidden::make('room_id'),
+                            Hidden::make('user_id'),
                         ]),
                     Step::make(__('Contact'))
                         ->icon('heroicon-o-clipboard-document-list')
@@ -214,20 +265,79 @@ class Booking extends Component implements HasForms
             ->statePath('data');
     }
 
+    private function getSelectedServiceIds(?array $serviceSelections): array
+    {
+        if (empty($serviceSelections)) {
+            return [];
+        }
+
+        $serviceIds = [];
+        foreach ($serviceSelections as $selection) {
+            if (isset($selection['service_id']) && isset($selection['quantity'])) {
+                // Add the service ID multiple times based on quantity
+                for ($i = 0; $i < (int)$selection['quantity']; $i++) {
+                    $serviceIds[] = $selection['service_id'];
+                }
+            }
+        }
+
+        return $serviceIds;
+    }
+
+    private function getSelectedServicesDescription(?array $serviceSelections): string
+    {
+        if (empty($serviceSelections)) {
+            return '';
+        }
+
+        $descriptions = [];
+        foreach ($serviceSelections as $selection) {
+            if (isset($selection['service_id']) && isset($selection['quantity'])) {
+                $service = Service::find($selection['service_id']);
+                if ($service) {
+                    $quantity = (int) $selection['quantity'];
+                    $descriptions[] = $quantity > 1
+                        ? "{$service->short_code} ({$quantity}x)"
+                        : $service->short_code;
+                }
+            }
+        }
+
+        return implode(', ', $descriptions);
+    }
+
     public function book(): void
     {
         $data = $this->form->getState();
 
         try {
             $customer = FindOrCreateCustomer::make($data)->execute();
+
+            // Extract services from service_selections
+            $services = [];
+            if (!empty($data['service_selections'])) {
+                foreach ($data['service_selections'] as $selection) {
+                    if (isset($selection['service_id']) && isset($selection['quantity'])) {
+                        $service = Service::find($selection['service_id']);
+                        if ($service) {
+                            // Add the service multiple times based on quantity
+                            for ($i = 0; $i < (int)$selection['quantity']; $i++) {
+                                $services[] = $service;
+                            }
+                        }
+                    }
+                }
+            }
+
             $appointment = BookAppointment::make(
                 date: CarbonImmutable::parse($data['date'])->setTimeFromTimeString($data['time']),
                 appointmentType: $data['appointment_type'],
-                branch: $data['branch_id'],
+                room: $data['room_id'],
                 category: $data['category_id'],
-                services: $data['services'],
+                services: $services,
                 customer: $customer,
-                providers: $data['providers'] ?? null,
+                user: $data['user_id'],
+                status: \App\Enums\Appointments\AppointmentStatus::Pending,
             )
                 ->execute();
         } catch (Throwable $e) {

@@ -166,7 +166,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes) => ($attributes['firstname'] ?? $attributes['name']).' '.$attributes['lastname'],
+            get: fn (mixed $value, array $attributes) => trim(($attributes['firstname'] ?? $attributes['name']).' '.($attributes['lastname'] ?? '')),
         );
     }
 
