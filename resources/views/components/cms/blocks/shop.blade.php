@@ -1,5 +1,5 @@
 <div class="cms-block py-4">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mb-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ $content['category_id'] ? \App\Models\Category::find($content['category_id'])->name : 'Preise' }} Preise</h2>
             @if($content['gender'] === 'female' || $content['gender'] === 'male')
@@ -28,21 +28,22 @@
                     </div>
                 </div>
                 <!-- Professional Pricing Table -->
-                <div class="bg-white border-4 border-blue-600 rounded-lg overflow-hidden shadow-lg" style="border: 4px solid #2563eb !important;">
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-fit">
+                <div class="bg-white border-2 border-blue-600 rounded-lg overflow-hidden shadow-lg" style="border: 2px solid #2563eb !important; margin: 0 auto; padding: 0; width: fit-content; display: block;">
+                    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100" style="padding: 0; -webkit-overflow-scrolling: touch;">
+                        <table class="w-full min-w-full" style="margin: 0; min-width: 500px; max-width: 700px;">
                             <thead>
                                 <tr class="bg-blue-50">
-                                    <th class="px-2 py-2 text-center text-sm font-bold text-blue-900 min-w-32 border-r-2 border-blue-600">
+                                    <th class="px-2 py-3 text-center text-sm font-bold text-blue-900 min-w-20 sm:min-w-24 border-r-2 border-blue-600">
                                         Name
                                     </th>
-                                    <th class="px-1 py-2 text-center text-xs font-semibold text-blue-900 min-w-20 border-r-2 border-blue-600">
-                                        1<br>Behandlung
+                                    <th class="px-1 py-3 text-center text-xs sm:text-sm font-semibold text-blue-900 min-w-12 sm:min-w-16 border-r-2 border-blue-600">
+                                        1<br class="sm:hidden">Behandlung
                                     </th>
-                                    <th colspan="3" class="px-1 py-2 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600">
-                                        Preis pro Behandlung beim Kauf von Paketen
+                                    <th colspan="3" class="px-1 py-3 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600" style="max-width: 120px;">
+                                        <span class="hidden sm:inline">Preis pro Behandlung<br>beim Kauf von Paketen</span>
+                                        <span class="sm:hidden">Paketpreise</span>
                                     </th>
-                                    <th class="px-2 py-2 text-center text-xs font-semibold text-blue-900 min-w-24 border-l-2 border-blue-600">
+                                    <th class="px-2 py-3 text-center text-xs font-semibold text-blue-900 min-w-12 sm:min-w-16 border-l-2 border-blue-600">
                                         Kaufen
                                     </th>
                                 </tr>
@@ -53,13 +54,13 @@
                                     <th class="px-1 py-2 text-center text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
                                         &nbsp;
                                     </th>
-                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important; max-width: 40px;">
                                         3
                                     </th>
-                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important; max-width: 40px;">
                                         6
                                     </th>
-                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important; max-width: 40px;">
                                         8
                                     </th>
                                     <th class="px-2 py-2 text-center text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
@@ -76,33 +77,30 @@
                                         $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
                                     @endphp
                                     <tr class="hover:bg-blue-25 transition-colors" style="border-bottom: 1px solid #2563eb !important;">
-                                        <td class="px-2 py-2 align-top border-r-2 border-blue-600">
-                                            <div class="text-xs font-medium text-gray-900">{{ $service->name }}</div>
+                                        <td class="px-1 sm:px-2 py-3 align-top border-r-2 border-blue-600" style="max-width: 100px; min-width: 60px;">
+                                            <div class="text-xs font-medium text-gray-900 break-words">{{ $service->name }}</div>
                                             @if($service->description)
-                                                <div class="text-xs text-gray-500 mt-1">{{ $service->description }}</div>
+                                                <div class="text-xs text-gray-500 mt-1 break-words">{{ $service->description }}</div>
                                             @endif
                                         </td>
-                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                        <td class="px-1 py-3 text-center align-top border-r-2 border-blue-600" style="min-width: 40px;">
                                             <div class="text-xs font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
-                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
-                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 3, 0, ',', '.') }}€</div>
+                                        <td class="px-1 py-3 text-center align-top border-r-2 border-blue-600" style="min-width: 40px;">
+                                            <div class="text-xs font-semibold text-gray-900">{{ number_format($package3Price, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
-                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
-                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
+                                        <td class="px-1 py-3 text-center align-top border-r-2 border-blue-600" style="min-width: 40px;">
+                                            <div class="text-xs font-semibold text-gray-900">{{ number_format($package6Price, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-1 py-2 text-center align-top border-r-2 border-blue-600">
-                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
-                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
+                                        <td class="px-1 py-3 text-center align-top border-r-2 border-blue-600" style="min-width: 40px;">
+                                            <div class="text-xs font-semibold text-gray-900">{{ number_format($package8Price, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-2 py-2 text-center align-top" style="background-color: #f8f9fa; border: 1px solid #2563eb;">
+                                        <td class="px-1 sm:px-2 py-3 text-center align-top" style="background-color: #f8f9fa; border: 1px solid #2563eb; min-width: 40px;">
                                             <form action="{{ route('cart.add') }}" method="POST" class="inline">
                                                 @csrf
                                                 <input type="hidden" name="item_type" value="service">
                                                 <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-3 rounded-md transition-colors border border-blue-600 hover:border-blue-700 flex items-center justify-center" style="background-color: #2563eb !important; color: white !important; display: flex !important; visibility: visible !important; min-height: 48px;">
+                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-2 sm:px-4 py-2 sm:py-3 rounded-md transition-colors border border-blue-600 hover:border-blue-700 flex items-center justify-center w-full" style="background-color: #2563eb !important; color: white !important; display: flex !important; visibility: visible !important; min-height: 36px;">
                                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style="display: block !important;">
                                                         <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM4 4a1 1 0 011-1h12.652a.5.5 0 01.489.395l2.5 10A.5.5 0 0120 14v1a1 1 0 01-1 1H4a1 1 0 010-2h12.764l-2.333-9.333H5a1 1 0 01-1-1z"/>
                                                     </svg>
