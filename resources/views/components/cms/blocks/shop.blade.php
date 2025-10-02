@@ -136,24 +136,24 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-4 flex flex-col space-y-2 w-full">
-                                    {{-- Always show both buttons --}}
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline w-full">
+                                <div class="mt-4 flex items-center justify-center space-x-3">
+                                    {{-- Always show both buttons side by side --}}
+                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
                                         @csrf
                                         <input type="hidden" name="item_type" value="service">
                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                        <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #2563eb !important; color: white !important; opacity: 1 !important;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
+                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #2563eb !important; color: white !important; opacity: 1 !important; width: 80px;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
                                             +1
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline w-full">
+                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
                                         @csrf
                                         <input type="hidden" name="item_type" value="package">
                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
                                         <input type="hidden" name="package_type" value="6x">
                                         <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                        <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #4b5563 !important; color: white !important; opacity: 1 !important;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
+                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #4b5563 !important; color: white !important; opacity: 1 !important; width: 80px;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
                                             +6
                                         </button>
                                     </form>
