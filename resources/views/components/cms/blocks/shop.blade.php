@@ -28,16 +28,16 @@
                     </div>
                 </div>
                 <!-- Professional Pricing Table -->
-                <div class="bg-white border-2 border-blue-600 rounded-lg overflow-hidden shadow-lg" style="border: 2px solid #2563eb !important; margin: 0 auto; padding: 0; width: fit-content; display: block;">
+                <div class="bg-white border-2 border-blue-600 rounded-lg overflow-hidden shadow-lg mx-auto max-w-4xl" style="border: 2px solid #2563eb !important; margin: 0 auto; padding: 0; width: 100%; display: block;">
                     <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100" style="padding: 0; -webkit-overflow-scrolling: touch;">
-                        <table class="w-full min-w-full" style="margin: 0; min-width: 500px; max-width: 700px;">
+                        <table class="w-full min-w-full mx-auto" style="margin: 0 auto; min-width: 500px; max-width: 900px;">
                             <thead>
                                 <tr class="bg-blue-50">
                                     <th class="px-2 py-3 text-center text-sm font-bold text-blue-900 min-w-20 sm:min-w-24 border-r-2 border-blue-600">
                                         Name
                                     </th>
                                     <th class="px-1 py-3 text-center text-xs sm:text-sm font-semibold text-blue-900 min-w-12 sm:min-w-16 border-r-2 border-blue-600">
-                                        1<br class="sm:hidden">Behandlung
+                                        <span class="text-xs sm:text-sm">Behandlung</span>
                                     </th>
                                     <th colspan="3" class="px-1 py-3 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600" style="max-width: 120px;">
                                         <span class="hidden sm:inline">Preis pro Behandlung<br>beim Kauf von Paketen</span>
@@ -51,8 +51,8 @@
                                     <th class="px-2 py-2 text-left text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
                                         &nbsp;
                                     </th>
-                                    <th class="px-1 py-2 text-center text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
-                                        &nbsp;
+                                    <th class="px-1 py-2 text-center text-sm font-bold text-blue-900" style="border-right: 2px solid #2563eb !important; max-width: 40px;">
+                                        <span class="text-sm">1</span>
                                     </th>
                                     <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important; max-width: 40px;">
                                         3
