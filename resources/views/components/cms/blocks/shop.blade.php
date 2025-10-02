@@ -20,6 +20,7 @@
 
         @endphp
 
+
         @if(isset($content['category_id']))
             @if($allServices->count() > 0)
                 <!-- Filter and Search Section -->
@@ -27,46 +28,46 @@
                     </div>
                 </div>
                 <!-- Professional Pricing Table -->
-                <div class="bg-white border-2 border-blue-600 rounded-lg overflow-hidden shadow-lg">
+                <div class="bg-white border-4 border-blue-600 rounded-lg overflow-hidden shadow-lg" style="border: 4px solid #2563eb !important;">
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full min-w-fit">
                             <thead>
                                 <tr class="bg-blue-50">
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-blue-900 min-w-48 border-r border-blue-300">
+                                    <th class="px-3 py-3 text-left text-xs font-semibold text-blue-900 min-w-32 border-r-2 border-blue-600">
                                         Name
                                     </th>
-                                    <th class="px-4 py-4 text-center text-sm font-semibold text-blue-900 min-w-24 border-r border-blue-300">
+                                    <th class="px-2 py-3 text-center text-xs font-semibold text-blue-900 min-w-20 border-r-2 border-blue-600">
                                         1<br>Behandlung
                                     </th>
-                                    <th colspan="3" class="px-4 py-4 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                    <th colspan="3" class="px-2 py-3 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600">
                                         Preis pro Behandlung beim Kauf von Paketen
                                     </th>
-                                    <th class="px-4 py-4 text-center text-sm font-semibold text-blue-900 min-w-32">
+                                    <th class="px-3 py-3 text-center text-xs font-semibold text-blue-900 min-w-24 border-l-2 border-blue-600">
                                         Kaufen
                                     </th>
                                 </tr>
-                                <tr class="bg-blue-25 border-b-2 border-blue-600">
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 border-r border-blue-300">
+                                <tr class="bg-blue-25" style="border-bottom: 2px solid #2563eb !important;">
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-blue-700 border-r-2 border-blue-600">
                                         &nbsp;
                                     </th>
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-blue-700 border-r border-blue-300">
+                                    <th class="px-2 py-2 text-center text-xs font-medium text-blue-700 border-r-2 border-blue-600">
                                         &nbsp;
                                     </th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
                                         3
                                     </th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
                                         6
                                     </th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
                                         8
                                     </th>
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-blue-700">
+                                    <th class="px-3 py-2 text-center text-xs font-medium text-blue-700">
                                         &nbsp;
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-blue-200">
+                            <tbody>
                                 @foreach($allServices as $service)
                                     @php
                                         $singlePrice = $service->price;
@@ -74,32 +75,39 @@
                                         $package6Price = round($singlePrice * 6 * 0.92, 0); // 8% discount
                                         $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
                                     @endphp
-                                    <tr class="hover:bg-blue-25 transition-colors">
-                                        <td class="px-6 py-4 align-top border-r border-blue-300">
-                                            <div class="text-sm font-medium text-gray-900">{{ $service->name }}</div>
+                                    <tr class="hover:bg-blue-25 transition-colors" style="border-bottom: 1px solid #2563eb !important;">
+                                        <td class="px-3 py-3 align-top border-r-2 border-blue-600">
+                                            <div class="text-xs font-medium text-gray-900">{{ $service->name }}</div>
                                             @if($service->description)
-                                                <div class="text-xs text-gray-600 mt-1">{{ $service->description }}</div>
+                                                <div class="text-xs text-gray-500 mt-1">{{ $service->description }}</div>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
-                                            <div class="text-sm font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
+                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                            <div class="text-xs font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
-                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
+                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
                                             <div class="text-xs text-gray-500">{{ number_format($singlePrice * 3, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
-                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
+                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
                                             <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
-                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
+                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                            <div class="text-xs font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
                                             <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-4 py-4 text-center align-top">
-                                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors border border-blue-600 hover:border-blue-700">
-                                                Kaufen
-                                            </button>
+                                        <td class="px-3 py-3 text-center align-top" style="background-color: #f8f9fa; border: 1px solid #2563eb;">
+                                            <form action="{{ route('cart.add') }}" method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="item_type" value="service">
+                                                <input type="hidden" name="item_id" value="{{ $service->id }}">
+                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-3 rounded-md transition-colors border border-blue-600 hover:border-blue-700 flex items-center justify-center" style="background-color: #2563eb !important; color: white !important; display: flex !important; visibility: visible !important; min-height: 48px;">
+                                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style="display: block !important;">
+                                                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM4 4a1 1 0 011-1h12.652a.5.5 0 01.489.395l2.5 10A.5.5 0 0120 14v1a1 1 0 01-1 1H4a1 1 0 010-2h12.764l-2.333-9.333H5a1 1 0 01-1-1z"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -108,69 +116,9 @@
                     </div>
                 </div>
 
-                <!-- Mobile Card View -->
-                <div class="lg:hidden space-y-4">
-                    @foreach($allServices as $service)
-                        @php
-                            $singlePrice = $service->price;
-                            $package3Price = round($singlePrice * 3 * 0.95, 0); // 5% discount
-                            $package6Price = round($singlePrice * 6 * 0.92, 0); // 8% discount
-                            $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
-                        @endphp
-                        <div class="bg-white border-2 border-blue-600 rounded-lg p-4 shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $service->name }}</h3>
-                            @if($service->description)
-                                <p class="text-sm text-gray-600 mb-4">{{ $service->description }}</p>
-                            @endif
-
-                            <!-- Header for mobile -->
-                            <div class="mb-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="text-center p-2 bg-gray-50 rounded border">
-                                        <div class="font-medium text-gray-900">1 Behandlung</div>
-                                        <div class="font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
-                                    </div>
-                                    <div class="text-center"></div>
-                                </div>
-                                <div class="bg-blue-50 border border-blue-300 rounded p-2 mt-2 text-center">
-                                    <div class="text-sm font-semibold text-blue-900 mb-2">Preis pro Behandlung beim Kauf von Paketen</div>
-                                    <div class="flex justify-center space-x-8">
-                                        <div class="font-semibold text-blue-900">3</div>
-                                        <div class="font-semibold text-blue-900">6</div>
-                                        <div class="font-semibold text-blue-900">8</div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-3 gap-2 text-sm mt-2">
-                                    <div class="text-center p-2 bg-green-50 rounded border">
-                                        <div class="font-medium text-green-900 text-xs">3 Paket</div>
-                                        <div class="font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
-                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 3, 0, ',', '.') }}€</div>
-                                    </div>
-                                    <div class="text-center p-2 bg-green-50 rounded border">
-                                        <div class="font-medium text-green-900 text-xs">6 Paket</div>
-                                        <div class="font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
-                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
-                                    </div>
-                                    <div class="text-center p-2 bg-green-50 rounded border">
-                                        <div class="font-medium text-green-900 text-xs">8 Paket</div>
-                                        <div class="font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
-                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                                <div class="text-center pt-2">
-                                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-md transition-colors border border-blue-600 hover:border-blue-700">
-                                        Kaufen
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
 
                 <!-- Cart Overview (shown on all screen sizes) -->
-                <div class="mt-6 bg-white border border-gray-200 p-4 mx-4 rounded-lg">
+                <div class="mt-6 bg-white border-2 border-blue-600 p-4 mx-4 rounded-lg">
                     <div class="flex items-center mb-3">
                         <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM4 4a1 1 0 011-1h12.652a.5.5 0 01.489.395l2.5 10A.5.5 0 0120 14v1a1 1 0 01-1 1H4a1 1 0 010-2h12.764l-2.333-9.333H5a1 1 0 01-1-1z"/>
@@ -182,7 +130,7 @@
                         <div class="text-sm text-gray-500 italic">Noch nichts ausgewählt</div>
                     </div>
 
-                    <div class="border-t border-gray-200 pt-3">
+                    <div class="border-t-2 border-blue-600 pt-3">
                         <div class="flex justify-between items-center">
                             <span class="text-base font-medium text-gray-700">Gesamt:</span>
                             <span id="cart-total" class="text-base font-bold text-green-600">0,00 €</span>
@@ -233,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let itemsHtml = '';
         items.forEach(item => {
             itemsHtml += `
-                <div class="flex justify-between items-center py-0.5 border-b border-gray-100 last:border-b-0">
+                <div class="flex justify-between items-center py-0.5 border-b border-blue-300 last:border-b-0">
                     <div class="flex-1 min-w-0">
                         <div class="font-medium text-gray-900 text-xs truncate">${item.name}</div>
                         <div class="text-xs text-gray-500">${item.type}</div>
