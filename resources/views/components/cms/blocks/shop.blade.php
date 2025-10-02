@@ -56,17 +56,17 @@
                                             <div class="text-xs text-gray-500 mt-1">{{ $service->short_code }}</div>
                                         </td>
                                         <td class="px-4 py-4 text-center">
-                                            <div class="flex items-center justify-center space-x-2" style="min-width: 280px; display: flex !important; visibility: visible !important;">
+                                            <div class="flex items-center justify-center space-x-2" style="min-width: 280px; display: flex !important; visibility: visible !important; flex-wrap: wrap; gap: 8px;">
                                                 {{-- Normalpreis Button --}}
                                                 @if(in_array('service_' . $service->id, $cart))
-                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm bg-green-100 text-green-800">
+                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm" style="background-color: #dcfce7 !important; color: #166534 !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #bbf7d0 !important;">
                                                         Im Warenkorb
                                                     </span>
                                                     <form action="{{ route('cart.remove') }}" method="POST" class="inline">
                                                         @csrf
                                                         <input type="hidden" name="item_type" value="service">
                                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700 bg-red-50 hover:bg-red-100">
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700" style="background-color: #fef2f2 !important; color: #b91c1c !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #fecaca !important;" onmouseover="this.style.backgroundColor='#fee2e2'" onmouseout="this.style.backgroundColor='#fef2f2'">
                                                             Entfernen
                                                         </button>
                                                     </form>
@@ -75,15 +75,15 @@
                                                         @csrf
                                                         <input type="hidden" name="item_type" value="service">
                                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-blue-600">
-                                                            Normalpreis {{ $service->price }} €
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white border border-blue-600" style="white-space: nowrap; background-color: #2563eb !important; color: white !important; opacity: 1 !important; visibility: visible !important;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
+                                                            +1
                                                         </button>
                                                     </form>
                                                 @endif
 
                                                 {{-- Paketpreis Button --}}
                                                 @if(in_array('package_' . $service->id . '_6x', $cart))
-                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm bg-blue-100 text-blue-800">
+                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm" style="background-color: #dbeafe !important; color: #1e40af !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #bfdbfe !important;">
                                                         Paket im Warenkorb
                                                     </span>
                                                     <form action="{{ route('cart.remove') }}" method="POST" class="inline">
@@ -92,7 +92,7 @@
                                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
                                                         <input type="hidden" name="package_type" value="6x">
                                                         <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700 bg-red-50 hover:bg-red-100">
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700" style="background-color: #fef2f2 !important; color: #b91c1c !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #fecaca !important;" onmouseover="this.style.backgroundColor='#fee2e2'" onmouseout="this.style.backgroundColor='#fef2f2'">
                                                             Paket entfernen
                                                         </button>
                                                     </form>
@@ -103,8 +103,8 @@
                                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
                                                         <input type="hidden" name="package_type" value="6x">
                                                         <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                                        <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 border border-gray-600">
-                                                            Paketpreis {{ $sixPackPrice }} €
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white border border-gray-600" style="white-space: nowrap; background-color: #4b5563 !important; color: white !important; opacity: 1 !important; visibility: visible !important;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
+                                                            +6
                                                         </button>
                                                     </form>
                                                 @endif
@@ -136,25 +136,25 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-4 flex items-center justify-center space-x-2" style="gap: 8px;">
+                                <div class="mt-4 flex flex-col space-y-2 w-full">
                                     {{-- Always show both buttons --}}
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
+                                    <form action="{{ route('cart.add') }}" method="POST" class="inline w-full">
                                         @csrf
                                         <input type="hidden" name="item_type" value="service">
                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" style="display: inline-flex !important; visibility: visible !important;">
-                                            Normalpreis {{ $service->price }} €
+                                        <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #2563eb !important; color: white !important; opacity: 1 !important;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
+                                            +1
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
+                                    <form action="{{ route('cart.add') }}" method="POST" class="inline w-full">
                                         @csrf
                                         <input type="hidden" name="item_type" value="package">
                                         <input type="hidden" name="item_id" value="{{ $service->id }}">
                                         <input type="hidden" name="package_type" value="6x">
                                         <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700" style="display: inline-flex !important; visibility: visible !important;">
-                                            Paketpreis {{ $sixPackPrice }} €
+                                        <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #4b5563 !important; color: white !important; opacity: 1 !important;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
+                                            +6
                                         </button>
                                     </form>
                                 </div>
