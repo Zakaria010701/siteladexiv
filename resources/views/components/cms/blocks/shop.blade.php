@@ -10,105 +10,96 @@
             $cart = session('cart', []);
             $category_id = $content['category_id'] ?? 1; // Default to category 1 if not set
             $category = \App\Models\Category::find($category_id);
-            $services = $category ? $category->services()->get() : collect();
+            $allServices = $category ? $category->services()->get() : collect();
 
-            // Debug info (remove this later)
-            $debug_info = [
-                'category_id' => $category_id,
-                'category_found' => $category ? true : false,
-                'services_count' => $services->count(),
-                'available_categories' => \App\Models\Category::pluck('name', 'id')->toArray()
-            ];
+
+            // Pagination logic - show first 8 services by default
+            $initialLimit = 8;
+            $services = $allServices->take($initialLimit);
+            $showLoadMore = $allServices->count() > $initialLimit;
+
         @endphp
 
         @if(isset($content['category_id']))
-            @if($services->count() > 0)
-                <!-- Desktop Table View -->
-                <div class="hidden lg:block bg-white border border-gray-200 overflow-hidden">
+            @if($allServices->count() > 0)
+                <!-- Filter and Search Section -->
+
+                    </div>
+                </div>
+                <!-- Professional Pricing Table -->
+                <div class="bg-white border-2 border-blue-600 rounded-lg overflow-hidden shadow-lg">
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
-                                <tr class="border-b border-gray-200 bg-gray-50">
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500 w-12">
-                                        <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <tr class="bg-blue-50">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-blue-900 min-w-48 border-r border-blue-300">
+                                        Name
                                     </th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                                        Behandlung
+                                    <th class="px-4 py-4 text-center text-sm font-semibold text-blue-900 min-w-24 border-r border-blue-300">
+                                        1<br>Behandlung
                                     </th>
-                                    <th class="px-4 py-3 text-center text-sm font-medium text-gray-500" style="min-width: 320px;">
-                                        Preise & Aktionen
+                                    <th colspan="3" class="px-4 py-4 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                        Preis pro Behandlung beim Kauf von Paketen
+                                    </th>
+                                    <th class="px-4 py-4 text-center text-sm font-semibold text-blue-900 min-w-32">
+                                        Kaufen
+                                    </th>
+                                </tr>
+                                <tr class="bg-blue-25 border-b-2 border-blue-600">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-blue-700 border-r border-blue-300">
+                                        &nbsp;
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-blue-700 border-r border-blue-300">
+                                        &nbsp;
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                        3
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                        6
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-blue-900 border-r border-blue-300">
+                                        8
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-blue-700">
+                                        &nbsp;
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($services as $service)
-                                    @php $originalSixPackPrice = $service->price * 6; @endphp
-                                    @php $sixPackPrice = round($originalSixPackPrice * 0.92, 0); @endphp
-                                    <tr class="hover:bg-gray-50" style="position: relative;">
-                                        <td class="px-4 py-4 text-center">
-                                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                        </td>
-                                        <td class="px-4 py-4">
+                            <tbody class="divide-y divide-blue-200">
+                                @foreach($allServices as $service)
+                                    @php
+                                        $singlePrice = $service->price;
+                                        $package3Price = round($singlePrice * 3 * 0.95, 0); // 5% discount
+                                        $package6Price = round($singlePrice * 6 * 0.92, 0); // 8% discount
+                                        $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
+                                    @endphp
+                                    <tr class="hover:bg-blue-25 transition-colors">
+                                        <td class="px-6 py-4 align-top border-r border-blue-300">
                                             <div class="text-sm font-medium text-gray-900">{{ $service->name }}</div>
                                             @if($service->description)
-                                                <div class="text-sm text-gray-600 mt-1">{{ $service->description }}</div>
+                                                <div class="text-xs text-gray-600 mt-1">{{ $service->description }}</div>
                                             @endif
-                                            <div class="text-xs text-gray-500 mt-1">{{ $service->short_code }}</div>
                                         </td>
-                                        <td class="px-4 py-4 text-center">
-                                            <div class="flex items-center justify-center space-x-2" style="min-width: 280px; display: flex !important; visibility: visible !important; flex-wrap: wrap; gap: 8px;">
-                                                {{-- Normalpreis Button --}}
-                                                @if(in_array('service_' . $service->id, $cart))
-                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm" style="background-color: #dcfce7 !important; color: #166534 !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #bbf7d0 !important;">
-                                                        Im Warenkorb
-                                                    </span>
-                                                    <form action="{{ route('cart.remove') }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="item_type" value="service">
-                                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700" style="background-color: #fef2f2 !important; color: #b91c1c !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #fecaca !important;" onmouseover="this.style.backgroundColor='#fee2e2'" onmouseout="this.style.backgroundColor='#fef2f2'">
-                                                            Entfernen
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="item_type" value="service">
-                                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white border border-blue-600" style="white-space: nowrap; background-color: #2563eb !important; color: white !important; opacity: 1 !important; visibility: visible !important;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
-                                                            +1
-                                                        </button>
-                                                    </form>
-                                                @endif
-
-                                                {{-- Paketpreis Button --}}
-                                                @if(in_array('package_' . $service->id . '_6x', $cart))
-                                                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm" style="background-color: #dbeafe !important; color: #1e40af !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #bfdbfe !important;">
-                                                        Paket im Warenkorb
-                                                    </span>
-                                                    <form action="{{ route('cart.remove') }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="item_type" value="package">
-                                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <input type="hidden" name="package_type" value="6x">
-                                                        <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm text-red-700" style="background-color: #fef2f2 !important; color: #b91c1c !important; opacity: 1 !important; visibility: visible !important; border: 1px solid #fecaca !important;" onmouseover="this.style.backgroundColor='#fee2e2'" onmouseout="this.style.backgroundColor='#fef2f2'">
-                                                            Paket entfernen
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="item_type" value="package">
-                                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                                        <input type="hidden" name="package_type" value="6x">
-                                                        <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                                        <button type="submit" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-white border border-gray-600" style="white-space: nowrap; background-color: #4b5563 !important; color: white !important; opacity: 1 !important; visibility: visible !important;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
-                                                            +6
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
+                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
+                                            <div class="text-sm font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
+                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
+                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 3, 0, ',', '.') }}€</div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
+                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
+                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center align-top border-r border-blue-300">
+                                            <div class="text-sm font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
+                                            <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center align-top">
+                                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors border border-blue-600 hover:border-blue-700">
+                                                Kaufen
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -118,45 +109,60 @@
                 </div>
 
                 <!-- Mobile Card View -->
-                <div class="lg:hidden space-y-3">
-                    @foreach($services as $service)
-                        @php $originalSixPackPrice = $service->price * 6; @endphp
-                        @php $sixPackPrice = round($originalSixPackPrice * 0.92, 0); @endphp
+                <div class="lg:hidden space-y-4">
+                    @foreach($allServices as $service)
+                        @php
+                            $singlePrice = $service->price;
+                            $package3Price = round($singlePrice * 3 * 0.95, 0); // 5% discount
+                            $package6Price = round($singlePrice * 6 * 0.92, 0); // 8% discount
+                            $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
+                        @endphp
+                        <div class="bg-white border-2 border-blue-600 rounded-lg p-4 shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $service->name }}</h3>
+                            @if($service->description)
+                                <p class="text-sm text-gray-600 mb-4">{{ $service->description }}</p>
+                            @endif
 
-                        <div class="bg-white border border-gray-200 mx-4 rounded-lg overflow-hidden">
-                            <div class="p-4">
-                                <div class="flex items-start space-x-3">
-                                    <input type="checkbox" class="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="text-base font-medium text-gray-900">{{ $service->name }}</h3>
-                                        @if($service->description)
-                                            <p class="text-sm text-gray-600 mt-1">{{ $service->description }}</p>
-                                        @endif
-                                        <p class="text-xs text-gray-500 mt-1">{{ $service->short_code }}</p>
+                            <!-- Header for mobile -->
+                            <div class="mb-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="text-center p-2 bg-gray-50 rounded border">
+                                        <div class="font-medium text-gray-900">1 Behandlung</div>
+                                        <div class="font-semibold text-gray-900">{{ number_format($singlePrice, 0, ',', '.') }}€</div>
+                                    </div>
+                                    <div class="text-center"></div>
+                                </div>
+                                <div class="bg-blue-50 border border-blue-300 rounded p-2 mt-2 text-center">
+                                    <div class="text-sm font-semibold text-blue-900 mb-2">Preis pro Behandlung beim Kauf von Paketen</div>
+                                    <div class="flex justify-center space-x-8">
+                                        <div class="font-semibold text-blue-900">3</div>
+                                        <div class="font-semibold text-blue-900">6</div>
+                                        <div class="font-semibold text-blue-900">8</div>
                                     </div>
                                 </div>
+                                <div class="grid grid-cols-3 gap-2 text-sm mt-2">
+                                    <div class="text-center p-2 bg-green-50 rounded border">
+                                        <div class="font-medium text-green-900 text-xs">3 Paket</div>
+                                        <div class="font-semibold text-green-700">{{ number_format($package3Price, 0, ',', '.') }}€</div>
+                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 3, 0, ',', '.') }}€</div>
+                                    </div>
+                                    <div class="text-center p-2 bg-green-50 rounded border">
+                                        <div class="font-medium text-green-900 text-xs">6 Paket</div>
+                                        <div class="font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
+                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
+                                    </div>
+                                    <div class="text-center p-2 bg-green-50 rounded border">
+                                        <div class="font-medium text-green-900 text-xs">8 Paket</div>
+                                        <div class="font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
+                                        <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                <div class="mt-4 flex items-center justify-center space-x-3">
-                                    {{-- Always show both buttons side by side --}}
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="item_type" value="service">
-                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #2563eb !important; color: white !important; opacity: 1 !important; width: 80px;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
-                                            +1
-                                        </button>
-                                    </form>
-
-                                    <form action="{{ route('cart.add') }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="item_type" value="package">
-                                        <input type="hidden" name="item_id" value="{{ $service->id }}">
-                                        <input type="hidden" name="package_type" value="6x">
-                                        <input type="hidden" name="package_price" value="{{ $sixPackPrice }}">
-                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium text-white" style="display: inline-flex !important; visibility: visible !important; background-color: #4b5563 !important; color: white !important; opacity: 1 !important; width: 80px;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#4b5563'">
-                                            +6
-                                        </button>
-                                    </form>
+                                <div class="text-center pt-2">
+                                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-md transition-colors border border-blue-600 hover:border-blue-700">
+                                        Kaufen
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -195,6 +201,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 SHOP PAGE LOADED - Initializing...');
+
     // Initialize cart overview on page load
     updateCartOverview();
 
@@ -277,5 +285,110 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error removing item:', error);
         });
     };
+
+    // Pagination Functionality
+    let currentLimit = {{ $initialLimit }};
+
+    // Initialize search and filter on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📋 DOM CONTENT LOADED - Starting initialization...');
+
+        // Show initial 8 services
+        console.log('📋 Showing initial 8 services on page load');
+        setServiceVisibility(8);
+
+        try {
+            initializePagination();
+            console.log('✅ Pagination initialized successfully');
+        } catch (error) {
+            console.error('❌ Error initializing pagination:', error);
+        }
+
+        try {
+            updateCartOverview();
+            console.log('✅ Cart overview initialized successfully');
+        } catch (error) {
+            console.error('❌ Error initializing cart overview:', error);
+        }
+    });
+
+    function initializePagination() {
+        try {
+            console.log('🔧 INITIALIZING PAGINATION');
+
+            // Items per page dropdown
+            const itemsPerPageSelect = document.getElementById('items-per-page');
+
+            if (itemsPerPageSelect) {
+                console.log('✅ Items per page dropdown found');
+                itemsPerPageSelect.addEventListener('change', function() {
+                    const newLimit = parseInt(this.value);
+                    setPaginationLimit(newLimit);
+                });
+                console.log('✅ Pagination event listener attached');
+            } else {
+                console.error('❌ Items per page dropdown not found!');
+            }
+
+            console.log('✅ Pagination setup complete');
+        } catch (error) {
+            console.error('❌ Error in initializePagination:', error);
+        }
+    }
+
+    function setPaginationLimit(newLimit) {
+        console.log('🔄 PAGINATION CHANGED TO:', newLimit);
+        currentLimit = newLimit;
+        setServiceVisibility(currentLimit);
+    }
+
+    function setServiceVisibility(limit) {
+        console.log(`🔧 SETTING VISIBILITY TO: ${limit}`);
+
+        let shownCount = 0;
+        document.querySelectorAll('.service-row').forEach((row, index) => {
+            if (shownCount < limit) {
+                row.style.display = 'table-row';
+                shownCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        shownCount = 0;
+        document.querySelectorAll('.service-card').forEach((card, index) => {
+            if (shownCount < limit) {
+                card.classList.remove('hidden');
+                shownCount++;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        console.log(`✅ Visibility set to ${limit} services`);
+    }
+
+    function updateServicesDisplay() {
+        console.log('🟡 UPDATE SERVICES DISPLAY CALLED');
+        console.log('Current limit:', currentLimit);
+        console.log('Filtered services:', filteredServices.length);
+
+        try {
+            // Force show all services if "Alle" is selected
+            if (currentLimit >= 47) {
+                console.log('🔴 SHOWING ALL SERVICES (Alle selected)');
+                setServiceVisibility(999); // Show all
+                console.log('🔴 ALL SERVICES SHOULD NOW BE VISIBLE');
+                return;
+            }
+
+            // Show only services up to current limit
+            console.log(`🟡 Showing up to ${currentLimit} services`);
+            setServiceVisibility(currentLimit);
+            console.log(`🟡 Display update complete`);
+        } catch (error) {
+            console.error('❌ Error in updateServicesDisplay:', error);
+        }
+    }
 });
 </script>
