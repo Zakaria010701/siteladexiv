@@ -52,6 +52,7 @@
                                 x-show="open"
                                 x-transition.origin.top.left
                                 x-on:click.outside="close($refs.button)"
+                                x-on:click="$event.target.tagName === 'A' && close($refs.button)"
                                 :id="$id('dropdown-button')"
                                 x-cloak
                                 x-trap="open"

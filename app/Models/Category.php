@@ -76,4 +76,9 @@ class Category extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+    public function packages(): HasMany
+    {
+        return $this->hasMany(ServicePackage::class);
+    }
 }

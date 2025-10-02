@@ -7,6 +7,7 @@ use App\Filament\Cms\Schemas\Components\Blocks\ImageTextBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\RichEditorBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\SectionBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\ShopBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\PackagesBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\SliderBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TableBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TabsBlock;
@@ -30,6 +31,7 @@ class CmsPageBuilder
                 SliderBlock::make(),
                 TableBlock::make(),
                 ShopBlock::make(),
+                PackagesBlock::make(),
                 FeatureCardsBlock::make(),
                 TestimonialCardsBlock::make(),
                 TabsBlock::make(),

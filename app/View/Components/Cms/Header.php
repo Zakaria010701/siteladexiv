@@ -18,7 +18,10 @@ class Header extends Component
      */
     public function __construct()
     {
-        $this->items = CmsMenuItem::query()->with('childItems')->whereNull('parent_id')->get();
+        $this->items = CmsMenuItem::query()
+            ->with(['childItems.reference', 'reference'])
+            ->whereNull('parent_id')
+            ->get();
     }
 
     /**

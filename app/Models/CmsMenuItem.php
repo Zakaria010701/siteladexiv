@@ -38,11 +38,11 @@ class CmsMenuItem extends Model
 
     public function getReferenceUrl(): string
     {
-        if($this->reference instanceof CmsPage) {
+        if($this->reference_type === 'App\Models\CmsPage' && $this->reference) {
             return route('cms.page', ['slug' => $this->reference->slug]);
         }
 
-        if($this->reference instanceof HeaderContact) {
+        if($this->reference_type === 'App\Models\HeaderContact' && $this->reference) {
             return '#header-contact';
         }
 
@@ -53,9 +53,43 @@ class CmsMenuItem extends Model
     {
         return match($this->type) {
             CmsMenuItemType::Page => $this->getReferenceUrl(),
+            CmsMenuItemType::Link => $this->generateLinkUrl(),
+            CmsMenuItemType::Header => $this->generateHeaderUrl(),
             CmsMenuItemType::Icon => $this->url ?? '#',
+            CmsMenuItemType::Button => $this->url ?? '#',
+            CmsMenuItemType::Dropdown => '#', // Dropdowns don't have direct URLs
             default => $this->url ?? '#',
         };
+    }
+
+    private function generateLinkUrl(): string
+    {
+        // If URL is set, use it
+        if ($this->url) {
+            return $this->url;
+        }
+
+        // If page reference exists, generate page URL
+        if ($this->reference instanceof CmsPage) {
+            return route('cms.page', ['slug' => $this->reference->slug]);
+        }
+
+        return '#';
+    }
+
+    private function generateHeaderUrl(): string
+    {
+        // If URL is set, use it
+        if ($this->url) {
+            return $this->url;
+        }
+
+        // If page reference exists, generate page URL
+        if ($this->reference instanceof CmsPage) {
+            return route('cms.page', ['slug' => $this->reference->slug]);
+        }
+
+        return '#';
     }
 
     public function getIcon(): string

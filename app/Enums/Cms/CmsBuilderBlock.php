@@ -14,6 +14,7 @@ enum CmsBuilderBlock: string
     case Slider = 'slider';
     case Table = 'table';
     case Shop = 'shop';
+    case Packages = 'packages';
     case FeatureCards = 'feature-cards';
     case TestimonialCards = 'testimonial-cards';
     case Tabs = 'tabs';
@@ -31,11 +32,11 @@ enum CmsBuilderBlock: string
             self::Slider => 'cms.blocks.slider',
             self::Table => 'cms.blocks.table',
             self::Shop => 'cms.blocks.shop',
+            self::Packages => 'cms.blocks.packages',
             self::FeatureCards => 'cms.blocks.feature-cards',
             self::TestimonialCards => 'cms.blocks.testimonial-cards',
             self::Tabs => 'cms.blocks.tabs',
             self::Section => 'cms.blocks.section',
-            self::ContactForm => 'cms.blocks.contact-form',
             default => '',
         };
     }

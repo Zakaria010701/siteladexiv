@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 
 class CmsMenuItemForm
 {
@@ -42,15 +43,47 @@ class CmsMenuItemForm
                         $get('type') == 'link' || $get('type') == 'icon' || $get('type') == 'button'
                     JS)
                     ->default(null),
-                Select::make('page')
-                    ->visibleJs(<<<'JS'
-                        $get('type') == 'page'
-                    JS)
+                Select::make('reference_id')
+                    ->label('Page')
+                    ->visible(function (callable $get) {
+                        $type = $get('type');
+                        $typeValue = is_object($type) ? $type->value : $type;
+                        Log::info('Menu item type selected: ' . $typeValue . ', showing page field: ' . ($typeValue === 'page' ? 'YES' : 'NO'));
+                        return $typeValue === 'page';
+                    })
                     ->searchable()
-                    ->formatStateUsing(fn (?CmsMenuItem $record) => $record?->reference_id)
-                    ->options(fn (?CmsMenuItem $record) => CmsPage::query()
-                        ->pluck('title', 'id')
-                        ->all()),
+                    ->options(function (?CmsMenuItem $record) {
+                        // Force load from CmsPage table specifically
+                        $pages = CmsPage::query()
+                            ->select('id', 'title', 'slug')
+                            ->orderBy('title')
+                            ->get();
+
+                        $options = [];
+                        foreach ($pages as $page) {
+                            $options[$page->id] = $page->title . ' (ID: ' . $page->id . ', Slug: ' . $page->slug . ')';
+                        }
+
+                        Log::info('CMS PAGES loaded for menu selection: ' . count($options));
+                        if (!empty($options)) {
+                            Log::info('First few CMS page options: ' . json_encode(array_slice($options, 0, 3, true)));
+                        }
+
+                        return $options ?: ['' => 'No CMS pages found - please create some pages first'];
+                    })
+                    ->default(fn (?CmsMenuItem $record) => $record?->reference_id)
+                    ->dehydrateStateUsing(function ($state, ?CmsMenuItem $record) {
+                        if ($record && $state) {
+                            $record->reference_type = 'App\Models\CmsPage';
+                            $record->reference_id = $state;
+                        }
+                        return $state;
+                    })
+                    ->helperText('Select a CMS page to link this menu item to')
+                    ->required()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        Log::info('Page selected for menu item: ' . $state);
+                    }),
                 FileUpload::make('icon')
                     ->visibleJs(<<<'JS'
                         $get('type') == 'icon'
@@ -84,16 +117,23 @@ class CmsMenuItemForm
                             $set('icon', null);
                         }
                     }),
-                Select::make('header_contact')
+                Select::make('header_contact_id')
+                    ->label('Header Contact')
                     ->visibleJs(<<<'JS'
                         $get('type') == 'header'
                     JS)
-                    ->label('Header Contact')
                     ->searchable()
-                    ->formatStateUsing(fn (?CmsMenuItem $record) => $record?->reference_id)
                     ->options(fn (?CmsMenuItem $record) => HeaderContact::query()
                         ->pluck('welcome_text', 'id')
                         ->all())
+                    ->default(fn (?CmsMenuItem $record) => $record?->reference_id)
+                    ->dehydrateStateUsing(function ($state, ?CmsMenuItem $record) {
+                        if ($record && $state) {
+                            $record->reference_type = 'App\Models\HeaderContact';
+                            $record->reference_id = $state;
+                        }
+                        return $state;
+                    })
                     ->createOptionForm([
                         TextInput::make('welcome_text')
                             ->required()

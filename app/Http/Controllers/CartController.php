@@ -157,15 +157,15 @@ class CartController extends Controller
                     $cartServices[] = $id;
                 }
             } else {
-                // Handle calculated packages (like 6x packages)
+                // Handle packages
                 $packageType = isset($parts[2]) ? $parts[2] : 'regular';
-                $service = Service::find($id);
-                if ($service) {
-                    $service->cart_type = 'package';
-                    $service->cart_key = $item;
-                    $service->package_type = $packageType;
-                    $service->calculated_price = $request->session()->get('package_price_' . $item);
-                    $cartItems->push($service);
+                $package = ServicePackage::find($id);
+                if ($package) {
+                    $package->cart_type = 'package';
+                    $package->cart_key = $item;
+                    $package->package_type = $packageType;
+                    $package->calculated_price = $request->session()->get('package_price_' . $item, $package->price);
+                    $cartItems->push($package);
                     $cartPackages[] = $id;
                 }
             }
@@ -204,15 +204,15 @@ class CartController extends Controller
                     $total += (float)$finalPrice;
                 }
             } else {
-                // Handle calculated packages
+                // Handle packages
                 $packageType = isset($parts[2]) ? $parts[2] : 'regular';
-                $service = Service::find($id);
-                if ($service) {
-                    $calculatedPrice = $request->session()->get('package_price_' . $item, 0);
+                $package = ServicePackage::find($id);
+                if ($package) {
+                    $calculatedPrice = $request->session()->get('package_price_' . $item, $package->price);
                     $cartItems[] = [
-                        'name' => $service->name . ' (' . $packageType . ')',
+                        'name' => $package->name,
                         'price' => $calculatedPrice,
-                        'type' => $packageType . ' Behandlungspaket',
+                        'type' => 'Paket',
                         'cartKey' => $item,
                         'originalType' => 'package',
                         'originalId' => $id,
