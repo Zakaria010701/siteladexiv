@@ -33,36 +33,36 @@
                         <table class="w-full min-w-fit">
                             <thead>
                                 <tr class="bg-blue-50">
-                                    <th class="px-3 py-3 text-left text-xs font-semibold text-blue-900 min-w-32 border-r-2 border-blue-600">
+                                    <th class="px-2 py-2 text-center text-sm font-bold text-blue-900 min-w-32 border-r-2 border-blue-600">
                                         Name
                                     </th>
-                                    <th class="px-2 py-3 text-center text-xs font-semibold text-blue-900 min-w-20 border-r-2 border-blue-600">
+                                    <th class="px-1 py-2 text-center text-xs font-semibold text-blue-900 min-w-20 border-r-2 border-blue-600">
                                         1<br>Behandlung
                                     </th>
-                                    <th colspan="3" class="px-2 py-3 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600">
+                                    <th colspan="3" class="px-1 py-2 text-center text-xs font-semibold text-blue-900 border-r-2 border-blue-600">
                                         Preis pro Behandlung beim Kauf von Paketen
                                     </th>
-                                    <th class="px-3 py-3 text-center text-xs font-semibold text-blue-900 min-w-24 border-l-2 border-blue-600">
+                                    <th class="px-2 py-2 text-center text-xs font-semibold text-blue-900 min-w-24 border-l-2 border-blue-600">
                                         Kaufen
                                     </th>
                                 </tr>
                                 <tr class="bg-blue-25" style="border-bottom: 2px solid #2563eb !important;">
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-blue-700 border-r-2 border-blue-600">
+                                    <th class="px-2 py-2 text-left text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
                                         &nbsp;
                                     </th>
-                                    <th class="px-2 py-2 text-center text-xs font-medium text-blue-700 border-r-2 border-blue-600">
+                                    <th class="px-1 py-2 text-center text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
                                         &nbsp;
                                     </th>
-                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
                                         3
                                     </th>
-                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
                                         6
                                     </th>
-                                    <th class="px-2 py-2 text-center text-sm font-semibold text-blue-900 border-r-2 border-blue-600">
+                                    <th class="px-1 py-2 text-center text-sm font-semibold text-blue-900" style="border-right: 2px solid #2563eb !important;">
                                         8
                                     </th>
-                                    <th class="px-3 py-2 text-center text-xs font-medium text-blue-700">
+                                    <th class="px-2 py-2 text-center text-xs font-medium text-blue-700" style="border-right: 2px solid #2563eb !important;">
                                         &nbsp;
                                     </th>
                                 </tr>
@@ -76,7 +76,7 @@
                                         $package8Price = round($singlePrice * 8 * 0.90, 0); // 10% discount
                                     @endphp
                                     <tr class="hover:bg-blue-25 transition-colors" style="border-bottom: 1px solid #2563eb !important;">
-                                        <td class="px-3 py-3 align-top border-r-2 border-blue-600">
+                                        <td class="px-2 py-2 align-top border-r-2 border-blue-600">
                                             <div class="text-xs font-medium text-gray-900">{{ $service->name }}</div>
                                             @if($service->description)
                                                 <div class="text-xs text-gray-500 mt-1">{{ $service->description }}</div>
@@ -93,11 +93,11 @@
                                             <div class="text-xs font-semibold text-green-700">{{ number_format($package6Price, 0, ',', '.') }}€</div>
                                             <div class="text-xs text-gray-500">{{ number_format($singlePrice * 6, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-2 py-3 text-center align-top border-r-2 border-blue-600">
+                                        <td class="px-1 py-2 text-center align-top border-r-2 border-blue-600">
                                             <div class="text-xs font-semibold text-green-700">{{ number_format($package8Price, 0, ',', '.') }}€</div>
                                             <div class="text-xs text-gray-500">{{ number_format($singlePrice * 8, 0, ',', '.') }}€</div>
                                         </td>
-                                        <td class="px-3 py-3 text-center align-top" style="background-color: #f8f9fa; border: 1px solid #2563eb;">
+                                        <td class="px-2 py-2 text-center align-top" style="background-color: #f8f9fa; border: 1px solid #2563eb;">
                                             <form action="{{ route('cart.add') }}" method="POST" class="inline">
                                                 @csrf
                                                 <input type="hidden" name="item_type" value="service">
