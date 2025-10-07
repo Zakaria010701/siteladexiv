@@ -24,6 +24,53 @@ class MediaItem extends Model implements HasMedia
         'files',
     ];
 
+    /**
+     * Force recreation of media files when model is updated
+     */
+    public function refreshMediaFiles()
+    {
+        if ($this->files && is_array($this->files)) {
+            foreach ($this->files as $filePath) {
+                $fullPath = storage_path('app/public/' . $filePath);
+                if (file_exists($fullPath)) {
+                    // Clear existing media
+                    $this->clearMediaCollection($this->collection ?: 'default');
+
+                    // Add the media file
+                    $this->addMediaFromPath($fullPath)
+                         ->usingName($this->name)
+                         ->usingFileName(basename($fullPath))
+                         ->toMediaCollection($this->collection ?: 'default');
+                }
+            }
+        }
+    }
+
+    /**
+     * Static method to refresh all media items
+     */
+    public static function refreshAllMediaFiles()
+    {
+        $items = self::all();
+        foreach ($items as $item) {
+            if ($item->files && is_array($item->files)) {
+                foreach ($item->files as $filePath) {
+                    $fullPath = storage_path('app/public/' . $filePath);
+                    if (file_exists($fullPath)) {
+                        // Clear existing media
+                        $item->clearMediaCollection($item->collection ?: 'default');
+
+                        // Add the media file
+                        $item->addMediaFromPath($fullPath)
+                             ->usingName($item->name)
+                             ->usingFileName(basename($fullPath))
+                             ->toMediaCollection($item->collection ?: 'default');
+                    }
+                }
+            }
+        }
+    }
+
     protected $casts = [
         'tags' => 'array',
         'is_public' => 'boolean',
@@ -31,36 +78,39 @@ class MediaItem extends Model implements HasMedia
     ];
 
     /**
-     * Boot the model
-     */
-    protected static function boot()
-    {
-        parent::boot();
+      * Boot the model
+      */
+     protected static function boot()
+     {
+         parent::boot();
 
-        static::saved(function ($mediaItem) {
-            // Handle file uploads when the model is saved
-            if ($mediaItem->files && is_array($mediaItem->files)) {
-                foreach ($mediaItem->files as $filePath) {
-                    try {
-                        $fullPath = storage_path('app/public/' . $filePath);
-                        if (file_exists($fullPath)) {
-                            $mediaFile = $mediaItem
-                                ->addMediaFromPath($fullPath)
-                                ->usingName($mediaItem->name)
-                                ->usingFileName(basename($fullPath))
-                                ->toMediaCollection($mediaItem->collection ?: 'default');
+         static::saved(function ($mediaItem) {
+             // Handle file uploads when the model is saved
+             if ($mediaItem->files && is_array($mediaItem->files)) {
+                 foreach ($mediaItem->files as $filePath) {
+                     try {
+                         $fullPath = storage_path('app/public/' . $filePath);
+                         if (file_exists($fullPath)) {
+                             // Clear any existing media files for this item
+                             $mediaItem->clearMediaCollection($mediaItem->collection ?: 'default');
 
-                            \Illuminate\Support\Facades\Log::info('Auto-created Spatie Media: ' . $mediaFile->id . ' for file: ' . $filePath);
-                        } else {
-                            \Illuminate\Support\Facades\Log::warning('File does not exist at path: ' . $fullPath);
-                        }
-                    } catch (\Exception $e) {
-                        \Illuminate\Support\Facades\Log::error('Failed to auto-create Spatie Media for file ' . $filePath . ': ' . $e->getMessage());
-                    }
-                }
-            }
-        });
-    }
+                             $mediaFile = $mediaItem
+                                 ->addMediaFromPath($fullPath)
+                                 ->usingName($mediaItem->name)
+                                 ->usingFileName(basename($fullPath))
+                                 ->toMediaCollection($mediaItem->collection ?: 'default');
+
+                             \Illuminate\Support\Facades\Log::info('Auto-created Spatie Media: ' . $mediaFile->id . ' for file: ' . $filePath);
+                         } else {
+                             \Illuminate\Support\Facades\Log::warning('File does not exist at path: ' . $fullPath);
+                         }
+                     } catch (\Exception $e) {
+                         \Illuminate\Support\Facades\Log::error('Failed to auto-create Spatie Media for file ' . $filePath . ': ' . $e->getMessage());
+                     }
+                 }
+             }
+         });
+     }
 
     /**
      * Get the media files associated with this media item
@@ -71,14 +121,14 @@ class MediaItem extends Model implements HasMedia
     }
 
     /**
-     * Register media collections
-     */
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('default')
-             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-             ->useDisk('public');
-    }
+      * Register media collections
+      */
+     public function registerMediaCollections(): void
+     {
+         $this->addMediaCollection('default')
+              ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+              ->useDisk('public');
+     }
 
     /**
      * Register media conversions

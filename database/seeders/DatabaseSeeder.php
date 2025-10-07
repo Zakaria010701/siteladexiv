@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoomSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(ServiceSeeder::class);
-        //$this->call(ServicePackageSeeder::class);
+        $this->call(ServicePackageSeeder::class);
         $this->call(AppointmentModuleSeeder::class);
         $this->call(UserWorkTypeSeeder::class);
         $this->call(TreatmentTypeSeeder::class);

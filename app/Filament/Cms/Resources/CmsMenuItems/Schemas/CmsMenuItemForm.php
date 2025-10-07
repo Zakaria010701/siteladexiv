@@ -84,6 +84,40 @@ class CmsMenuItemForm
                     ->afterStateUpdated(function ($state, callable $set) {
                         Log::info('Page selected for menu item: ' . $state);
                     }),
+                Select::make('dropdown_page_id')
+                    ->label('Dropdown Page (Optional)')
+                    ->visible(function (callable $get) {
+                        $type = $get('type');
+                        $typeValue = is_object($type) ? $type->value : $type;
+                        Log::info('Menu item type for dropdown page: ' . $typeValue . ', showing dropdown page field: ' . ($typeValue === 'dropdown' ? 'YES' : 'NO'));
+                        return $typeValue === 'dropdown';
+                    })
+                    ->searchable()
+                    ->options(function (?CmsMenuItem $record) {
+                        $pages = CmsPage::query()
+                            ->select('id', 'title', 'slug')
+                            ->orderBy('title')
+                            ->get();
+
+                        $options = [];
+                        foreach ($pages as $page) {
+                            $options[$page->id] = $page->title . ' (ID: ' . $page->id . ', Slug: ' . $page->slug . ')';
+                        }
+
+                        Log::info('CMS PAGES loaded for dropdown page selection: ' . count($options));
+                        return $options ?: ['' => 'No CMS pages found - please create some pages first'];
+                    })
+                    ->default(fn (?CmsMenuItem $record) => $record?->dropdown_page_id)
+                    ->dehydrateStateUsing(function ($state, ?CmsMenuItem $record) {
+                        if ($record && $state) {
+                            $record->dropdown_page_id = $state;
+                        }
+                        return $state;
+                    })
+                    ->helperText('Optional: Select a page that this dropdown should link to when clicked')
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        Log::info('Dropdown page selected: ' . $state);
+                    }),
                 FileUpload::make('icon')
                     ->visibleJs(<<<'JS'
                         $get('type') == 'icon'

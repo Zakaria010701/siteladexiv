@@ -6,6 +6,7 @@ use App\Models\Service;
 use App\Models\ServicePackage;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
@@ -23,14 +24,32 @@ class CartController extends Controller
 
             if ($type === 'service') {
                 $request->validate(['item_id' => 'exists:services,id']);
-                $cartKey = $type . '_' . $id;
 
-                // Store quantity information
-                if ($quantity > 1) {
-                    $request->session()->put('service_quantity_' . $cartKey, $quantity);
-                    $request->session()->put('service_unit_price_' . $cartKey, $request->input('unit_price', 0));
-                    $request->session()->put('service_discount_' . $cartKey, $request->input('discount', 0));
-                    $request->session()->put('service_total_price_' . $cartKey, $request->input('total_price', 0));
+                // Use package_count if provided, otherwise default to 1
+                $packageCount = $request->input('package_type', 1);
+                $cartKey = $type . '_' . $id . '_' . $packageCount;
+
+                // Get the service to calculate the correct price
+                $service = Service::find($id);
+                if ($service) {
+                    $basePrice = $service->price;
+
+                    // Calculate total price for the package with discount
+                    if ($packageCount == 3) {
+                        $totalPrice = round($basePrice * 3 * 0.95, 2); // 5% discount for 3-pack
+                    } elseif ($packageCount == 6) {
+                        $totalPrice = round($basePrice * 6 * 0.92, 2); // 8% discount for 6-pack
+                    } elseif ($packageCount == 8) {
+                        $totalPrice = round($basePrice * 8 * 0.90, 2); // 10% discount for 8-pack
+                    } else {
+                        $totalPrice = $basePrice * $packageCount; // No discount for other quantities
+                    }
+
+                    // Store quantity information
+                    $request->session()->put('service_quantity_' . $cartKey, $packageCount);
+                    $request->session()->put('service_unit_price_' . $cartKey, $basePrice);
+                    $request->session()->put('service_discount_' . $cartKey, 0);
+                    $request->session()->put('service_total_price_' . $cartKey, $totalPrice);
                 }
             } else {
                 // Handle calculated packages (like 6x packages)
@@ -51,12 +70,45 @@ class CartController extends Controller
                 $request->session()->put('cart', $cart);
             }
 
+            // Get updated cart details to return
+            $cartItems = [];
+            $total = 0;
+
+            foreach ($cart as $item) {
+                $parts = explode('_', $item);
+                $itemType = $parts[0];
+                $itemId = $parts[1];
+
+                if ($itemType === 'service') {
+                    $service = Service::find($itemId);
+                    if ($service) {
+                        $itemQuantity = $request->session()->get('service_quantity_' . $item, 1);
+                        $unitPrice = $request->session()->get('service_unit_price_' . $item, $service->price);
+                        $discount = $request->session()->get('service_discount_' . $item, 0);
+                        $finalPrice = $request->session()->get('service_total_price_' . $item, $unitPrice * (1 - $discount));
+
+                        $cartItems[] = [
+                            'name' => $service->name,
+                            'price' => $finalPrice,
+                            'type' => $itemQuantity > 1 ? $itemQuantity . 'er-Pack' : 'Einzelbehandlung',
+                            'cart_key' => $item,
+                            'cartKey' => $item,
+                            'originalType' => 'service',
+                            'originalId' => $itemId
+                        ];
+                        $total += (float)$finalPrice;
+                    }
+                }
+            }
+
             // Always return JSON for AJAX requests
             if ($request->expectsJson() || $request->is('api/*') || $request->header('Content-Type') === 'application/json') {
                 return response()->json([
                     'success' => true,
                     'cartCount' => count($cart),
-                    'message' => ($type === 'service' ? 'Service' : 'Package') . ' added to cart!'
+                    'message' => ($type === 'service' ? 'Service' : 'Package') . ' added to cart!',
+                    'cartItems' => $cartItems,
+                    'cartTotal' => number_format($total, 2, ',', '.')
                 ]);
             }
 
@@ -177,6 +229,7 @@ class CartController extends Controller
     public function getDetails(Request $request)
     {
         $cart = $request->session()->get('cart', []);
+        Log::info('CartController getDetails called', ['cart' => $cart, 'session_id' => $request->session()->getId()]);
         $cartItems = [];
         $total = 0;
 
@@ -196,7 +249,8 @@ class CartController extends Controller
                     $cartItems[] = [
                         'name' => $service->name,
                         'price' => $finalPrice,
-                        'type' => $quantity > 1 ? $quantity . 'x Behandlung' : 'Einzelbehandlung',
+                        'type' => $quantity > 1 ? $quantity . 'er-Pack' : 'Einzelbehandlung',
+                        'cart_key' => $item,
                         'cartKey' => $item,
                         'originalType' => 'service',
                         'originalId' => $id

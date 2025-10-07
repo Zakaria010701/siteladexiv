@@ -1,4 +1,7 @@
 <div class="cms-block py-8">
+    @if(isset($content['title']) && $content['title'])
+    <h2 class="text-3xl font-bold mb-4 text-center">{{ $content['title'] }}</h2>
+    @endif
     <div class="flex {{ trim($content['image_position'] ?? 'left') === 'left' ? 'flex-row image-left' : 'flex-row-reverse image-right' }} items-start gap-6">
         @if($content['image'] ?? false)
         <div class="flex-1 {{ trim($content['image_position'] ?? 'left') === 'left' ? 'pr-6' : 'pl-6' }}">
@@ -16,9 +19,6 @@
         @endif
         @endif
         <div class="flex-1 {{ trim($content['image_position'] ?? 'left') === 'left' ? 'pl-6' : 'pr-6' }}">
-            @if(isset($content['title']) && $content['title'])
-            <h2 class="text-3xl font-bold mb-4">{{ $content['title'] }}</h2>
-            @endif
             <div class="prose prose-lg max-w-none">
                 {!! $content['content'] ?? '' !!}
             </div>

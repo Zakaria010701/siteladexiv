@@ -18,8 +18,7 @@ class ImageTextBlock
             ->schema([
                 TextInput::make('title')
                     ->label('Title (optional)'),
-                RichEditor::make('content')
-                    ->required(),
+                RichEditor::make('content'),
                 FileUpload::make('image')
                     ->disk('public')
                     ->image()

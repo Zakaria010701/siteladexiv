@@ -43,7 +43,6 @@
     </main>
 
 <x-cms.footer />
-</div>
 
 <!-- Scripts -->
 @vite('resources/js/cms/cms.js')

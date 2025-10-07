@@ -175,6 +175,7 @@ return [
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\FilamentServiceProvider::class,
         App\Providers\SettingServiceProvider::class,
+        Spatie\MediaLibrary\MediaLibraryServiceProvider::class,
     ])->toArray(),
 
     /*

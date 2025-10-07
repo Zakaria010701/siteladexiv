@@ -1,4 +1,84 @@
 <header class="animate-fade-in">
+    <!-- Mobile Hamburger Menu -->
+    <div class="block md:hidden fixed top-4 left-4 z-50" x-data="{ mobileMenuOpen: false }">
+        <button
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="{ 'bg-blue-50': mobileMenuOpen }"
+        >
+            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 text-gray-700">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 text-gray-700">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Mobile Menu Panel -->
+        <div
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-x-full"
+            x-transition:enter-end="opacity-100 transform translate-x-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-x-0"
+            x-transition:leave-end="opacity-0 transform -translate-x-full"
+            class="fixed top-0 left-0 w-80 h-full bg-white shadow-2xl z-40 overflow-y-auto"
+            x-on:click.outside="mobileMenuOpen = false"
+        >
+            <div class="p-6 pt-20">
+                @foreach($items as $key => $item)
+                    @if($item->type == \App\Enums\Cms\CmsMenuItemType::Dropdown)
+                        <div class="mb-4">
+                            <div class="font-semibold text-gray-800 mb-2 px-3">{{ $item->title }}</div>
+                            <div class="ml-3 space-y-1">
+                                @foreach($item->childItems as $child)
+                                    <a href="{{ $child->getUrl() }}" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                                        {{ $child->title }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @elseif($item->type == \App\Enums\Cms\CmsMenuItemType::Icon)
+                        <div class="mb-4">
+                            <a href="{{ $item->getUrl() }}" class="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                                @if($item->getIcon())
+                                    @if(str_contains($item->getIcon(), '<svg'))
+                                        {!! $item->getIcon() !!}
+                                    @else
+                                        <img src="{{ $item->getIcon() }}" alt="{{ $item->title }}" class="w-5 h-5 mr-3">
+                                    @endif
+                                @endif
+                                <span>{{ $item->title }}</span>
+                            </a>
+                        </div>
+                    @elseif($item->type == \App\Enums\Cms\CmsMenuItemType::Button)
+                        <div class="mb-4">
+                            <a href="{{ $item->getUrl() }}" class="block w-full text-center px-4 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                               style="background: linear-gradient(135deg, #3991b3 0%, #2c5aa0 100%);">
+                                {{ $item->title }}
+                            </a>
+                        </div>
+                    @else
+                        <div class="mb-4">
+                            <a href="{{ $item->getUrl() }}" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium">
+                                {{ $item->title }}
+                            </a>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Backdrop -->
+        <div
+            x-show="mobileMenuOpen"
+            class="fixed inset-0 bg-black bg-opacity-50 z-30"
+            x-on:click="mobileMenuOpen = false"
+        ></div>
+    </div>
+
+    <!-- Desktop Navigation -->
     <nav class="hidden md:flex lg:flex flex-wrap items-center justify-center py-5 px-8 mx-6 mb-10 mt-4">
         @foreach($items as $key => $item)
             @if($item->type == \App\Enums\Cms\CmsMenuItemType::Dropdown)

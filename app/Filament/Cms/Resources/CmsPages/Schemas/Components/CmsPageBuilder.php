@@ -3,6 +3,7 @@
 namespace App\Filament\Cms\Resources\CmsPages\Schemas\Components;
 
 use App\Filament\Cms\Schemas\Components\Blocks\FeatureCardsBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\ImageHeaderBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\ImageTextBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\RichEditorBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\SectionBlock;
@@ -14,6 +15,8 @@ use App\Filament\Cms\Schemas\Components\Blocks\TabsBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TestimonialCardsBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TitleBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\ContactFormBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\FaqBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\SimpleButtonBlock;
 use Filament\Forms\Components\Builder;
 
 class CmsPageBuilder
@@ -26,6 +29,7 @@ class CmsPageBuilder
                 RichEditorBlock::make(),
                 SectionBlock::make(),
                 ImageTextBlock::make(),
+                ImageHeaderBlock::make(),
                 \App\Filament\Cms\Schemas\Components\Blocks\IconTextBlock::make(),
                 \App\Filament\Cms\Schemas\Components\Blocks\BoxBlock::make(),
                 SliderBlock::make(),
@@ -36,6 +40,8 @@ class CmsPageBuilder
                 TestimonialCardsBlock::make(),
                 TabsBlock::make(),
                 ContactFormBlock::make(),
+                SimpleButtonBlock::make(),
+                FaqBlock::make(),
             ]);
     }
 }

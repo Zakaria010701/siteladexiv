@@ -9,6 +9,7 @@ enum CmsBuilderBlock: string
     case Title = 'title';
     case RichEditor = 'editor';
     case ImageText = 'image_text';
+    case ImageHeader = 'image_header';
     case IconText = 'icon-text';
     case Box = 'box';
     case Slider = 'slider';
@@ -19,7 +20,9 @@ enum CmsBuilderBlock: string
     case TestimonialCards = 'testimonial-cards';
     case Tabs = 'tabs';
     case Section = 'section';
-   
+    case SimpleButton = 'simple_button';
+    case Faq = 'faq';
+
 
     public function getComponentName(): string
     {
@@ -27,6 +30,7 @@ enum CmsBuilderBlock: string
             self::RichEditor => 'cms.blocks.rich-text',
             self::Title => 'cms.blocks.title',
             self::ImageText => 'cms.blocks.image-text',
+            self::ImageHeader => 'cms.blocks.image-header',
             self::IconText => 'cms.blocks.icon-text',
             self::Box => 'cms.blocks.box',
             self::Slider => 'cms.blocks.slider',
@@ -37,6 +41,8 @@ enum CmsBuilderBlock: string
             self::TestimonialCards => 'cms.blocks.testimonial-cards',
             self::Tabs => 'cms.blocks.tabs',
             self::Section => 'cms.blocks.section',
+            self::SimpleButton => 'cms.blocks.simple-button',
+            self::Faq => 'cms.blocks.faq',
             default => '',
         };
     }

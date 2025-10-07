@@ -377,6 +377,13 @@
     }
 
     /* Responsive Design Improvements */
+    @media (min-width: 768px) {
+        /* Ensure desktop navigation is visible on desktop */
+        nav[class*="hidden md:flex"] {
+            display: flex !important;
+        }
+    }
+
     @media (max-width: 768px) {
         .cms-block {
             @apply mx-4 px-6 py-12;
@@ -410,6 +417,11 @@
 
         h3 {
             @apply text-lg;
+        }
+
+        /* Force hide desktop navigation on mobile */
+        nav[class*="hidden md:flex"] {
+            display: none !important;
         }
     }
 

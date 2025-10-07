@@ -13,7 +13,7 @@ class CmsMenuItem extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
-        'type', 'title', 'parent_id', 'url', 'page', 'icon', 'icon_svg', 'header_contact', 'position'
+        'type', 'title', 'parent_id', 'url', 'page', 'icon', 'icon_svg', 'header_contact', 'position', 'dropdown_page_id'
     ];
 
     protected $casts = [
@@ -34,6 +34,11 @@ class CmsMenuItem extends Model
     public function childItems(): HasMany
     {
         return $this->hasMany(CmsMenuItem::class, 'parent_id')->orderBy('position');
+    }
+
+    public function dropdownPage(): BelongsTo
+    {
+        return $this->belongsTo(CmsPage::class, 'dropdown_page_id');
     }
 
     public function getReferenceUrl(): string
@@ -57,7 +62,7 @@ class CmsMenuItem extends Model
             CmsMenuItemType::Header => $this->generateHeaderUrl(),
             CmsMenuItemType::Icon => $this->url ?? '#',
             CmsMenuItemType::Button => $this->url ?? '#',
-            CmsMenuItemType::Dropdown => '#', // Dropdowns don't have direct URLs
+            CmsMenuItemType::Dropdown => $this->getDropdownUrl(), // Dropdowns can now have URLs
             default => $this->url ?? '#',
         };
     }
@@ -89,6 +94,17 @@ class CmsMenuItem extends Model
             return route('cms.page', ['slug' => $this->reference->slug]);
         }
 
+        return '#';
+    }
+
+    private function getDropdownUrl(): string
+    {
+        // If dropdown has a linked page, use that URL
+        if ($this->dropdown_page_id && $this->dropdownPage) {
+            return route('cms.page', ['slug' => $this->dropdownPage->slug]);
+        }
+
+        // Otherwise, dropdowns without linked pages don't have direct URLs
         return '#';
     }
 

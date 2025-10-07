@@ -52,17 +52,21 @@ class AllMediaResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
-            ->with('mediaFiles')
-            ->whereHas('mediaFiles', function ($query) {
+            ->with(['mediaFiles' => function ($query) {
                 $query->where('mime_type', 'like', 'image/%');
+            }])
+            ->where(function ($query) {
+                // Include records that have files (regardless of Spatie Media objects)
+                $query->whereNotNull('files')
+                      ->whereJsonLength('files', '>', 0);
             })
             ->orderBy('created_at', 'desc');
     }
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::whereHas('mediaFiles', function ($query) {
-            $query->where('mime_type', 'like', 'image/%');
-        })->count();
+        return static::getModel()::whereNotNull('files')
+            ->whereJsonLength('files', '>', 0)
+            ->count();
     }
 }

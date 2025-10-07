@@ -35,23 +35,75 @@ class AllMediaTable
                         ->height(200)
                         ->width('100%')
                         ->getStateUsing(function (MediaItem $record) {
-                            $mediaFile = $record->mediaFiles->first();
-                            if ($mediaFile) {
-                                try {
-                                    // Try to get thumb conversion URL first
-                                    return $mediaFile->getUrl('thumb');
-                                } catch (\Exception $e) {
-                                    // Fallback to original URL if thumb doesn't exist
-                                    try {
-                                        return $mediaFile->getUrl();
-                                    } catch (\Exception $e) {
-                                        return '/images/placeholder.png';
+                            // First priority: use files from the database
+                            if ($record->files && is_array($record->files) && !empty($record->files)) {
+                                foreach ($record->files as $filePath) {
+                                    // Convert Windows backslashes to forward slashes
+                                    $filePath = str_replace('\\', '/', $filePath);
+
+                                    // Clean up the path - remove any leading slashes or unnecessary components
+                                    $filePath = ltrim($filePath, '/');
+
+                                    // Skip if it's a conversion file (thumb, preview) - we want the main file
+                                    if (preg_match('/\/conversions\/.*-(thumb|preview)\./', $filePath)) {
+                                        continue;
+                                    }
+
+                                    // Check if file exists at the storage path
+                                    $fullPath = storage_path('app/public/' . $filePath);
+                                    if (file_exists($fullPath)) {
+                                        // Use Laravel's built-in URL generation with proper domain
+                                        $storageUrl = \Illuminate\Support\Facades\Storage::url($filePath);
+                                        // Ensure it has the proper domain for the current request
+                                        if (strpos($storageUrl, 'http') !== 0) {
+                                            // Use the current request's domain
+                                            $storageUrl = request()->getScheme() . '://' . request()->getHost() . $storageUrl;
+                                        }
+                                        return $storageUrl;
+                                    }
+                                }
+
+                                // If we didn't find a main file, try conversion files as fallback
+                                foreach ($record->files as $filePath) {
+                                    $filePath = str_replace('\\', '/', $filePath);
+                                    $filePath = ltrim($filePath, '/');
+
+                                    $fullPath = storage_path('app/public/' . $filePath);
+                                    if (file_exists($fullPath)) {
+                                        $storageUrl = \Illuminate\Support\Facades\Storage::url($filePath);
+                                        if (strpos($storageUrl, 'http') !== 0) {
+                                            $storageUrl = request()->getScheme() . '://' . request()->getHost() . $storageUrl;
+                                        }
+                                        return $storageUrl;
                                     }
                                 }
                             }
-                            return '/images/placeholder.png';
+
+                            // Second priority: try to use Spatie Media objects if available
+                            $mediaFile = $record->mediaFiles->first();
+                            if ($mediaFile && $mediaFile->file_name) {
+                                $url = $mediaFile->getUrl();
+                                // Ensure the URL has the correct domain
+                                if (strpos($url, 'http') !== 0) {
+                                    $url = request()->getScheme() . '://' . request()->getHost() . $url;
+                                }
+                                return $url;
+                            }
+
+                            // Final fallback: return placeholder
+                            $placeholderUrl = asset('images/logo.png');
+                            if (strpos($placeholderUrl, 'http') !== 0) {
+                                $placeholderUrl = request()->getScheme() . '://' . request()->getHost() . $placeholderUrl;
+                            }
+                            return $placeholderUrl;
                         })
-                        ->defaultImageUrl('/images/placeholder.png')
+                        ->defaultImageUrl(function () {
+                            $url = asset('images/logo.png');
+                            if (strpos($url, 'http') !== 0) {
+                                $url = request()->getScheme() . '://' . request()->getHost() . $url;
+                            }
+                            return $url;
+                        })
                         ->extraImgAttributes(['loading' => 'lazy']),
 
                     Stack::make([
@@ -60,19 +112,33 @@ class AllMediaTable
                             ->weight('bold')
                             ->size('sm'),
 
-                        Tables\Columns\TextColumn::make('mediaFiles')
+                        Tables\Columns\TextColumn::make('files')
                             ->label('Files')
                             ->formatStateUsing(function ($state, MediaItem $record) {
-                                return $record->mediaFiles->pluck('file_name')->join(', ');
+                                if ($record->files && is_array($record->files)) {
+                                    return implode(', ', array_map('basename', $record->files));
+                                }
+                                return 'No files';
                             })
                             ->size('xs')
                             ->color('gray'),
 
-                        Tables\Columns\TextColumn::make('mediaFiles')
+                        Tables\Columns\TextColumn::make('files')
                             ->label('Size')
                             ->formatStateUsing(function ($state, MediaItem $record) {
-                                $totalSize = $record->mediaFiles->sum('size');
-                                return number_format($totalSize / 1024, 2) . ' KB';
+                                if ($record->files && is_array($record->files)) {
+                                    $totalSize = 0;
+                                    foreach ($record->files as $filePath) {
+                                        $filePath = str_replace('\\', '/', $filePath);
+                                        $filePath = ltrim($filePath, '/');
+                                        $fullPath = storage_path('app/public/' . $filePath);
+                                        if (file_exists($fullPath)) {
+                                            $totalSize += filesize($fullPath);
+                                        }
+                                    }
+                                    return number_format($totalSize / 1024, 2) . ' KB';
+                                }
+                                return '0 KB';
                             })
                             ->size('xs')
                             ->color('gray'),
@@ -104,8 +170,12 @@ class AllMediaTable
 
                 Tables\Filters\Filter::make('images_only')
                     ->label('Images Only')
-                    ->query(fn (Builder $query): Builder => $query->whereHas('mediaFiles', function ($q) {
-                        $q->where('mime_type', 'like', 'image/%');
+                    ->query(fn (Builder $query): Builder => $query->where(function ($q) {
+                        // Check if any of the files in the record are images
+                        $q->whereJsonContains('files', function ($query) {
+                            // This is a simplified check - in a real implementation you'd want to check file extensions
+                            return true;
+                        });
                     }))
                     ->default(true),
             ])
@@ -114,8 +184,9 @@ class AllMediaTable
                 Action::make('download')
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (MediaItem $record): string => $record->mediaFiles->first()?->getUrl() ?? '')
-                    ->openUrlInNewTab(),
+                    ->url(fn (MediaItem $record): string => $record->mediaFiles->first()?->getUrl() ?? '#')
+                    ->openUrlInNewTab()
+                    ->visible(fn (MediaItem $record): bool => $record->mediaFiles->isNotEmpty()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

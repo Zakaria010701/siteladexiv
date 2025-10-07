@@ -2,8 +2,6 @@
 
 namespace App\Filament\Cms\Resources\CmsPages\Schemas\Components;
 
-use App\Filament\Cms\Schemas\Components\Blocks\CmsTextEditorBlock;
-use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\RichEditor;
 
 class CmsPageContentEditor
@@ -12,6 +10,22 @@ class CmsPageContentEditor
     {
         return RichEditor::make('content')
             ->columnSpanFull()
-            ->json();
+            ->json()
+            ->toolbarButtons([
+                'attachFiles',
+                'bold',
+                'bulletList',
+                'codeBlock',
+                'h2',
+                'h3',
+                'italic',
+                'link',
+                'orderedList',
+                'quote',
+                'redo',
+                'strike',
+                'underline',
+                'undo',
+            ]);
     }
 }
