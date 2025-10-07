@@ -1,5 +1,5 @@
 <header class="animate-fade-in">
-    <nav class="flex flex-wrap items-center justify-center py-5 px-8 mx-6 mb-10 mt-4">
+    <nav class="hidden md:flex lg:flex flex-wrap items-center justify-center py-5 px-8 mx-6 mb-10 mt-4">
         @foreach($items as $key => $item)
             @if($item->type == \App\Enums\Cms\CmsMenuItemType::Dropdown)
                 <div class="flex justify-center animate-slide-up" style="animation-delay: {{ $key * 0.1 }}s">
