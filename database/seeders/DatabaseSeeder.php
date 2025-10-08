@@ -28,5 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(SystemResourceSeeder::class);
         $this->call(SampleDataSeeder::class);
         $this->call(MediaSeeder::class);
+        $this->call(CmsSeeder::class);
     }
 }
