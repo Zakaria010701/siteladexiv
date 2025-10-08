@@ -21,7 +21,15 @@ class ImageHeaderBlock
                     ->placeholder('Enter heading text to display on the image'),
                 FileUpload::make('image')
                     ->disk('public')
+                    ->directory('cms-pages')
                     ->image()
+                    ->imagePreviewHeight('150')
+                    ->maxSize(5120)
+                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'])
+                    ->openable()
+                    ->downloadable()
+                    ->deletable()
+                    ->preserveFilenames()
                     ->label('Upload Background Image')
                     ->required(),
                 MediaSelector::make('media_id')

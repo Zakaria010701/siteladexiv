@@ -101,7 +101,6 @@
         border: none !important;
         transform: translateY(0);
         position: relative;
-        overflow: hidden;
     }
 
     .dropdown-btn:hover {
@@ -119,6 +118,21 @@
     .dropdown-btn:hover svg {
         transform: rotate(180deg);
         color: #3991B3;
+    }
+
+    .dropdown-arrow-btn {
+        transition: transform 0.3s ease;
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+    }
+
+    .dropdown-arrow-btn:hover {
+        background: rgba(57, 145, 179, 0.1);
+    }
+
+    .dropdown-arrow-btn:focus {
+        outline: 2px solid rgba(57, 145, 179, 0.5);
+        outline-offset: 2px;
     }
 
     .cms-block {

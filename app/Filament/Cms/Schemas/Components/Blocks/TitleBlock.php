@@ -19,7 +19,15 @@ class TitleBlock
                     ->required(),
                 FileUpload::make('image')
                     ->disk('public')
+                    ->directory('cms-pages')
                     ->image()
+                    ->imagePreviewHeight('150')
+                    ->maxSize(5120)
+                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'])
+                    ->openable()
+                    ->downloadable()
+                    ->deletable()
+                    ->preserveFilenames()
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('16:9'),
                 Select::make('position')

@@ -20,6 +20,9 @@ enum CmsBuilderBlock: string
     case TestimonialCards = 'testimonial-cards';
     case Tabs = 'tabs';
     case Section = 'section';
+    case SimpleImage = 'simple_image';
+    case VideoText = 'video_text';
+    case TwoColumnText = 'two_column_text';
     case SimpleButton = 'simple_button';
     case Faq = 'faq';
 
@@ -41,6 +44,9 @@ enum CmsBuilderBlock: string
             self::TestimonialCards => 'cms.blocks.testimonial-cards',
             self::Tabs => 'cms.blocks.tabs',
             self::Section => 'cms.blocks.section',
+            self::SimpleImage => 'cms.blocks.simple-image',
+            self::VideoText => 'cms.blocks.video-text',
+            self::TwoColumnText => 'cms.blocks.two-column-text',
             self::SimpleButton => 'cms.blocks.simple-button',
             self::Faq => 'cms.blocks.faq',
             default => '',

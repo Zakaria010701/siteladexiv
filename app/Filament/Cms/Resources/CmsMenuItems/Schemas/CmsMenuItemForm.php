@@ -27,16 +27,50 @@ class CmsMenuItemForm
                 TextInput::make('title')
                     ->required(),
                 Select::make('parent_id')
+                    ->label('Übergeordnete Seite')
+                    ->helperText('Wählen Sie eine übergeordnete Seite oder Dropdown aus, um verschachtelte Menüs zu erstellen')
                     ->visibleJs(<<<'JS'
                         $get('type') != 'dropdown' && $get('type') != 'icon' && $get('type') != 'button'
                     JS)
                     ->relationship(
                         name:'parent',
                         titleAttribute: 'title',
-                        modifyQueryUsing: fn (Builder $query, ?CmsMenuItem $record) => $query->when($record, fn (Builder $query) => $query->where('id', '!=', $record->id))
-                            ->where('type', 'dropdown')
-                            ->whereNull('parent_id')
+                        modifyQueryUsing: function (Builder $query, ?CmsMenuItem $record) {
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+                            // Allow both dropdowns and pages as parents
+                            return $query->whereIn('type', ['dropdown', 'page']);
+                        }
                     )
+                    ->getOptionLabelFromRecordUsing(function (?CmsMenuItem $record) {
+                        // Handle null record
+                        if (!$record) {
+                            return 'Unbekannt';
+                        }
+
+                        // Create a visual hierarchy indicator
+                        $prefix = '';
+                        $current = $record;
+                        $depth = 0;
+                        while ($current->parent && $depth < 3) {
+                            $prefix .= '→ ';
+                            $current = $current->parent;
+                            $depth++;
+                        }
+
+                        $typeLabel = match($record->type->value ?? 'unknown') {
+                            'dropdown' => '[D]',
+                            'page' => '[S]',
+                            'link' => '[L]',
+                            default => '[' . strtoupper(substr($record->type->value ?? 'U', 0, 1)) . ']'
+                        };
+
+                        return $prefix . $record->title . ' ' . $typeLabel;
+                    })
+                    ->searchable()
+                    ->allowHtml()
+                    ->placeholder('Keine übergeordnete Seite (Hauptmenü)')
                     ->default(null),
                 TextInput::make('url')
                     ->visibleJs(<<<'JS'

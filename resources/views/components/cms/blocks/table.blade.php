@@ -19,7 +19,7 @@
                         <tr class="hover:bg-gray-50">
                             @if(isset($row['cells']) && count($row['cells']) > 0)
                                 @foreach($row['cells'] as $cell)
-                                    <td class="border border-gray-300 px-4 py-2">{{ $cell['content'] ?? '' }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">{!! is_array($cell['content'] ?? '') ? implode(' ', $cell['content'] ?? []) : ($cell['content'] ?? '') !!}</td>
                                 @endforeach
                             @endif
                             {{-- Pad if fewer cells than columns --}}

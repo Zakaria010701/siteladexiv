@@ -33,9 +33,26 @@
                             <div class="font-semibold text-gray-800 mb-2 px-3">{{ $item->title }}</div>
                             <div class="ml-3 space-y-1">
                                 @foreach($item->childItems as $child)
-                                    <a href="{{ $child->getUrl() }}" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
-                                        {{ $child->title }}
-                                    </a>
+                                    @if(($child->type == \App\Enums\Cms\CmsMenuItemType::Dropdown || $child->type == \App\Enums\Cms\CmsMenuItemType::Page) && $child->childItems->count() > 0)
+                                        <!-- Nested Dropdown in Mobile (from Dropdown or Page parent) -->
+                                        <div class="mb-2">
+                                            <a href="{{ $child->getUrl() }}" class="font-medium text-gray-800 px-3 py-1 text-sm block hover:text-blue-600 transition-colors">
+                                                {{ $child->title }}
+                                            </a>
+                                            <div class="ml-3 space-y-1">
+                                                @foreach($child->childItems as $grandChild)
+                                                    <a href="{{ $grandChild->getUrl() }}" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                                                        {{ $grandChild->title }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @else
+                                        <!-- Regular Menu Item in Mobile -->
+                                        <a href="{{ $child->getUrl() }}" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                                            {{ $child->title }}
+                                        </a>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>
@@ -109,22 +126,27 @@
                         class="relative"
                     >
                         <!-- Button -->
-                        <button
+                        <div class="dropdown-btn" style="background: transparent !important; display: flex; align-items: center; gap: 0.5rem;">
+                            <a href="{{ $item->getUrl() }}" class="font-semibold" style="text-decoration: none; color: inherit;">
+                                {{$item->title}}
+                            </a>
+
+                            <!-- Arrow button - only controls dropdown -->
+                            <button
                                 x-ref="button"
                                 x-on:click="toggle()"
                                 :aria-expanded="open"
                                 :aria-controls="$id('dropdown-button')"
                                 type="button"
-                                class="dropdown-btn"
-                                style="background: transparent !important;"
-                        >
-                            <span class="font-semibold">{{$item->title}}</span>
-
-                            <!-- Heroicon: micro chevron-down -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transition-transform duration-300">
-                                <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
+                                class="dropdown-arrow-btn"
+                                style="background: transparent; border: none; padding: 0.25rem; color: inherit; cursor: pointer;"
+                            >
+                                <!-- Heroicon: micro chevron-down -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transition-transform duration-300">
+                                    <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
 
                         <!-- Panel -->
                         <div
@@ -132,7 +154,6 @@
                                 x-show="open"
                                 x-transition.origin.top.left
                                 x-on:click.outside="close($refs.button)"
-                                x-on:click="$event.target.tagName === 'A' && close($refs.button)"
                                 :id="$id('dropdown-button')"
                                 x-cloak
                                 x-trap="open"
@@ -140,9 +161,34 @@
                                 style="background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);"
                         >
                             @foreach($item->childItems as $child)
-                                <a href="{{ $child->getUrl() }}" class="px-4 py-3 w-full flex items-center rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
-                                    <span class="transform transition-transform duration-200 hover:translate-x-1">{{ $child->title }}</span>
-                                </a>
+                                @if(($child->type == \App\Enums\Cms\CmsMenuItemType::Dropdown || $child->type == \App\Enums\Cms\CmsMenuItemType::Page) && $child->childItems->count() > 0)
+                                    <!-- Nested Dropdown (from Dropdown or Page parent) -->
+                                    <div class="relative group">
+                                        <div class="flex items-center justify-between px-4 py-3 w-full rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+                                            <a href="{{ $child->getUrl() }}" class="flex-1 transform transition-transform duration-200 hover:translate-x-1">
+                                                {{ $child->title }}
+                                            </a>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transition-transform duration-300 group-hover:translate-x-1">
+                                                <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+
+                                        <!-- Nested Panel -->
+                                        <div class="absolute left-full top-0 min-w-52 rounded-xl shadow-xl ml-1 z-30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2"
+                                             style="background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                            @foreach($child->childItems as $grandChild)
+                                                <a href="{{ $grandChild->getUrl() }}" class="px-4 py-3 w-full flex items-center rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+                                                    <span class="transform transition-transform duration-200 hover:translate-x-1">{{ $grandChild->title }}</span>
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @else
+                                    <!-- Regular Menu Item -->
+                                    <a href="{{ $child->getUrl() }}" class="px-4 py-3 w-full flex items-center rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+                                        <span class="transform transition-transform duration-200 hover:translate-x-1">{{ $child->title }}</span>
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     </div>

@@ -1,66 +1,88 @@
-<div class="cms-slider-block py-12">
-    @if($title)
-    <h2 class="text-3xl font-bold mb-8 text-center">{{ $title }}</h2>
-    @endif
+<section class="cms-block">
+    <div class="container mx-auto px-6">
+        @php
+        $allImages = [];
+        $blockData = $content ?? [];
+        $title = $blockData['title'] ?? '';
+        $content = $blockData['content'] ?? '';
+        $sliderPosition = $blockData['slider_position'] ?? 'left';
+        $autoplay = $blockData['autoplay'] ?? false;
+        $autoplayDelay = $blockData['autoplay_delay'] ?? 3000;
+        $titleColor = $blockData['title_color'] ?? '#000000';
 
-    @php
-    $allImages = [];
+        $mediaIds = $blockData['media_ids'] ?? [];
+        $images = $blockData['images'] ?? [];
 
-    // The block data is in the 'content' variable
-    $blockData = $content ?? [];
-    $mediaIds = $blockData['media_ids'] ?? [];
-    $images = $blockData['images'] ?? [];
-    $title = $blockData['title'] ?? $title ?? 'No Title';
-
-    if(count($images) > 0) {
-        $allImages = $images;
-    } elseif(count($mediaIds) > 0) {
-        foreach($mediaIds as $mediaId) {
-            $mediaItem = \App\Models\MediaItem::find($mediaId);
-            if($mediaItem && $mediaItem->mediaFiles->isNotEmpty()) {
-                foreach($mediaItem->mediaFiles as $media) {
-                    $allImages[] = $media->getUrl();
+        if(count($images) > 0) {
+            $allImages = $images;
+        } elseif(count($mediaIds) > 0) {
+            foreach($mediaIds as $mediaId) {
+                $mediaItem = \App\Models\MediaItem::find($mediaId);
+                if($mediaItem && $mediaItem->mediaFiles->isNotEmpty()) {
+                    foreach($mediaItem->mediaFiles as $media) {
+                        $allImages[] = $media->getUrl();
+                    }
                 }
             }
         }
-    }
+        @endphp
 
-    // Debug output
-    $debugInfo = "Images count: " . count($allImages) . ", Media IDs: " . implode(', ', $mediaIds ?: ['none']) . ", Content keys: " . implode(', ', array_keys($blockData));
-    @endphp
-
-
-    @if(count($allImages) > 0)
-    <div class="slider-container relative overflow-hidden rounded-lg shadow-lg">
-        <div class="slider-wrapper flex transition-transform duration-500 ease-in-out" id="slider-wrapper-{{ uniqid() }}">
-            @foreach($allImages as $image)
-            <div class="slider-slide flex-shrink-0 w-full">
-                <img src="{{ $image }}" alt="" class="w-full h-80 md:h-128 object-cover">
-            </div>
-            @endforeach
-        </div>
-
-        @if(count($allImages) > 1)
-        <!-- Navigation buttons -->
-        <button class="slider-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all" type="button">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-        </button>
-        <button class="slider-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all" type="button">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-        </button>
-
-        <!-- Dots indicator -->
-        <div class="slider-dots absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            @for($i = 0; $i < count($allImages); $i++)
-            <button class="slider-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all {{ $i === 0 ? 'bg-opacity-100' : '' }}" data-slide="{{ $i }}"></button>
-            @endfor
-        </div>
+        @if($title)
+            <h2 class="text-3xl font-bold mb-12 text-center" style="color: {{ $titleColor }};">
+                {{ $title }}
+            </h2>
         @endif
-    </div>
+
+            @if(count($allImages) > 0)
+                <div class="grid lg:grid-cols-2 gap-8 items-center max-w-7xl mx-auto">
+                    <!-- Slider Section -->
+                    <div class="{{ $sliderPosition === 'left' ? 'lg:order-1' : 'lg:order-2' }}">
+                        <div class="slider-container relative overflow-hidden rounded-lg shadow-lg">
+                            <div class="slider-wrapper flex transition-transform duration-500 ease-in-out" id="slider-wrapper-{{ uniqid() }}">
+                                @foreach($allImages as $image)
+                                <div class="slider-slide flex-shrink-0 w-full">
+                                    <img src="{{ $image }}" alt="" class="w-full h-64 md:h-80 lg:h-96 object-cover">
+                                </div>
+                                @endforeach
+                            </div>
+   
+                            @if(count($allImages) > 1)
+                            <!-- Navigation buttons -->
+                            <button class="slider-prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all" type="button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button class="slider-next absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all" type="button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+   
+                            <!-- Dots indicator -->
+                            <div class="slider-dots absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                @for($i = 0; $i < count($allImages); $i++)
+                                <button class="slider-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all {{ $i === 0 ? 'bg-opacity-100' : '' }}" data-slide="{{ $i }}"></button>
+                                @endfor
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+   
+                    <!-- Content Section -->
+                    <div class="{{ $sliderPosition === 'left' ? 'lg:order-2' : 'lg:order-1' }} bg-white rounded-lg p-6 shadow-sm">
+                        @if($content)
+                            <div class="prose prose-lg max-w-none text-gray-700">
+                                {!! $content !!}
+                            </div>
+                        @else
+                            <div class="text-gray-500 italic">
+                                Kein Textinhalt hinzugefügt.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -113,9 +135,9 @@
             });
 
             // Autoplay
-            @if($autoplay)
+            @if($autoplay ?? false)
             function startAutoplay() {
-                autoplayInterval = setInterval(nextSlide, {{ $autoplayDelay }});
+                autoplayInterval = setInterval(nextSlide, {{ $autoplayDelay ?? 3000 }});
             }
 
             function stopAutoplay() {
@@ -135,5 +157,4 @@
             updateSlider();
         });
     </script>
-    @endif
 </div>

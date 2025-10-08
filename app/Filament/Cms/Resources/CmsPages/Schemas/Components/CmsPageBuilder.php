@@ -14,6 +14,9 @@ use App\Filament\Cms\Schemas\Components\Blocks\TableBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TabsBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TestimonialCardsBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\TitleBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\TwoColumnTextBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\SimpleImageBlock;
+use App\Filament\Cms\Schemas\Components\Blocks\VideoTextBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\ContactFormBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\FaqBlock;
 use App\Filament\Cms\Schemas\Components\Blocks\SimpleButtonBlock;
@@ -25,23 +28,26 @@ class CmsPageBuilder
     {
         return Builder::make('content')
             ->blocks([
-                TitleBlock::make(),
-                RichEditorBlock::make(),
-                SectionBlock::make(),
-                ImageTextBlock::make(),
-                ImageHeaderBlock::make(),
-                \App\Filament\Cms\Schemas\Components\Blocks\IconTextBlock::make(),
-                \App\Filament\Cms\Schemas\Components\Blocks\BoxBlock::make(),
-                SliderBlock::make(),
-                TableBlock::make(),
-                ShopBlock::make(),
-                PackagesBlock::make(),
-                FeatureCardsBlock::make(),
-                TestimonialCardsBlock::make(),
-                TabsBlock::make(),
-                ContactFormBlock::make(),
-                SimpleButtonBlock::make(),
-                FaqBlock::make(),
-            ]);
+                 TitleBlock::make(),
+                 RichEditorBlock::make(),
+                 SimpleImageBlock::make(),
+                 VideoTextBlock::make(),
+                 TwoColumnTextBlock::make(),
+                 SectionBlock::make(),
+                 ImageTextBlock::make(),
+                 ImageHeaderBlock::make(),
+                 \App\Filament\Cms\Schemas\Components\Blocks\IconTextBlock::make(),
+                 \App\Filament\Cms\Schemas\Components\Blocks\BoxBlock::make(),
+                 SliderBlock::make(),
+                 TableBlock::make(),
+                 ShopBlock::make(),
+                 PackagesBlock::make(),
+                 FeatureCardsBlock::make(),
+                 TestimonialCardsBlock::make(),
+                 TabsBlock::make(),
+                 ContactFormBlock::make(),
+                 SimpleButtonBlock::make(),
+                 FaqBlock::make(),
+             ]);
     }
 }
