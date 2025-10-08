@@ -163,18 +163,44 @@
                             @foreach($item->childItems as $child)
                                 @if(($child->type == \App\Enums\Cms\CmsMenuItemType::Dropdown || $child->type == \App\Enums\Cms\CmsMenuItemType::Page) && $child->childItems->count() > 0)
                                     <!-- Nested Dropdown (from Dropdown or Page parent) -->
-                                    <div class="relative group">
+                                    <div class="relative"
+                                         x-data="{
+                                             nestedOpen: false,
+                                             toggleNested() {
+                                                 this.nestedOpen = !this.nestedOpen;
+                                             },
+                                             closeNested() {
+                                                 this.nestedOpen = false;
+                                             }
+                                         }"
+                                         x-on:keydown.escape.prevent.stop="closeNested()"
+                                         x-on:focusin.window="! $el.contains($event.target) && closeNested()"
+                                    >
                                         <div class="flex items-center justify-between px-4 py-3 w-full rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
                                             <a href="{{ $child->getUrl() }}" class="flex-1 transform transition-transform duration-200 hover:translate-x-1">
                                                 {{ $child->title }}
                                             </a>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transition-transform duration-300 group-hover:translate-x-1">
-                                                <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                                            </svg>
+                                            <button
+                                                x-on:click="toggleNested()"
+                                                :aria-expanded="nestedOpen"
+                                                type="button"
+                                                class="p-1 hover:bg-gray-100 rounded transition-colors"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transition-transform duration-300" :class="{ 'rotate-90': nestedOpen }">
+                                                    <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
                                         </div>
 
                                         <!-- Nested Panel -->
-                                        <div class="absolute left-full top-0 min-w-52 rounded-xl shadow-xl ml-1 z-30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2"
+                                        <div x-show="nestedOpen"
+                                             x-transition:enter="transition ease-out duration-200"
+                                             x-transition:enter-start="opacity-0 transform scale-95"
+                                             x-transition:enter-end="opacity-100 transform scale-100"
+                                             x-transition:leave="transition ease-in duration-150"
+                                             x-transition:leave-start="opacity-100 transform scale-100"
+                                             x-transition:leave-end="opacity-0 transform scale-95"
+                                             class="absolute left-full top-0 min-w-52 rounded-xl shadow-xl ml-1 z-30 p-2"
                                              style="background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
                                             @foreach($child->childItems as $grandChild)
                                                 <a href="{{ $grandChild->getUrl() }}" class="px-4 py-3 w-full flex items-center rounded-lg transition-all duration-200 text-left text-gray-800 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
